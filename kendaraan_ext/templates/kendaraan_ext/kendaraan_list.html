@@ -1,0 +1,47 @@
+{% extends "base.html" %} 
+
+{% block title %}Data Kepemilikan (Admin View){% endblock %}
+
+{% block content %}
+<h1 class="mb-4 text-danger border-bottom pb-2">📊 Data Kepemilikan & Mitra</h1>
+
+<div class="table-responsive bg-white p-3 rounded shadow-sm">
+    <table class="table table-hover table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Kendaraan</th>
+                <th>Plat Nomor</th>
+                <th>Kepemilikan</th>
+                <th>ID Mitra</th>
+                <th>Bagi Hasil</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ext in kendaraanext_list %}
+            <tr>
+                <td>**{{ ext.kendaraan.merek }} {{ ext.kendaraan.model }}**</td>
+                <td><span class="badge bg-secondary">{{ ext.kendaraan.plat_nomor }}</span></td>
+                <td>
+                    {% if ext.tipe_kepemilikan == "Mitra" %}
+                        <span class="badge bg-warning text-dark"><i class="fas fa-handshake me-1"></i> Mitra</span>
+                    {% else %}
+                        <span class="badge bg-success"><i class="fas fa-user-shield me-1"></i> Milik Sendiri</span>
+                    {% endif %}
+                </td>
+                <td>{{ ext.id_mitra|default:"-" }}</td>
+                <td>**{{ ext.persen_bagi_hasil }}%**</td>
+                <td>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">Tidak ada data kepemilikan tambahan terdaftar.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
