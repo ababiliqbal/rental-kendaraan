@@ -1,0 +1,44 @@
+{% extends "base.html" %} 
+{% load humanize %} 
+
+
+{% block title %}Daftar Mobil Mewah dan Ekonomis{% endblock %}
+{% block content %}
+<h1 class="mb-4 text-primary border-bottom pb-2">🚗 Mobil Siap Sewa</h1>
+
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for mobil in mobil_list %}
+    <div class="col">
+        <div class="card h-100 card-kendaraan shadow-sm">
+            {% if mobil.kendaraan.gambar %}
+            <img src="{{ mobil.kendaraan.gambar.url }}" class="card-img-top" alt="Gambar Mobil {{ mobil.kendaraan.merek }}" style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 180px; color: #6c757d;">
+                <i class="fas fa-image fa-2x"></i>
+            </div>
+            {% endif %}
+
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-dark fw-bold mb-1">{{ mobil.kendaraan.merek }} {{ mobil.kendaraan.model }}</h5>
+                <p class="card-text text-muted mb-3">Tahun: **{{ mobil.kendaraan.tahun }}** | **{{ mobil.kendaraan.plat_nomor }}**</p>
+                
+                <ul class="list-unstyled mb-3 small">
+                    <li><i class="fas fa-chair text-info me-2"></i> Kursi: **{{ mobil.jumlah_kursi }}**</li>
+                    <li><i class="fas fa-cogs text-info me-2"></i> Transmisi: **{{ mobil.transmisi }}**</li>
+                    <li><i class="fas fa-user-tag text-info me-2"></i> Kepemilikan: <span class="badge {% if mobil.kendaraanext.tipe_kepemilikan == 'Mitra' %}bg-warning text-dark{% else %}bg-success{% endif %}">{{ mobil.kendaraanext.tipe_kepemilikan|default:"-" }}</span></li>
+                </ul>
+
+                <h3 class="mt-auto text-success fw-bolder">Rp {{ mobil.kendaraan.harga_sewa_per_hari|floatformat:0|intcomma }}/Hari</h3>
+
+                <a href="{% url 'mobil_detail' pk=mobil.pk %}" class="btn btn-primary mt-2"><i class="fas fa-info-circle"></i> Detail</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info" role="alert"><i class="fas fa-exclamation-circle"></i> Maaf, tidak ada mobil yang tersedia saat ini.</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
