@@ -1,7 +1,6 @@
 from django.db import models
 from rental_app.models import Kendaraan   # ← Import model temanmu
 
-
 class KendaraanExt(models.Model):
     KEPEMILIKAN_CHOICES = [
         ("Milik Sendiri", "Milik Sendiri"),
