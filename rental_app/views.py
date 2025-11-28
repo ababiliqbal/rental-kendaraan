@@ -8,7 +8,6 @@ from .forms import RegistrasiPelangganForm
 
 def register_pelanggan(request):
     if request.method == 'POST':
-        # Jika user menekan tombol Submit
         form = RegistrasiPelangganForm(request.POST)
         if form.is_valid():
             form.save() # Simpan user & profil ke database
@@ -22,10 +21,7 @@ def register_pelanggan(request):
 
 def home(request):
     kendaraan_list = Kendaraan.objects.filter(status='Tersedia')
-    context = {
-        'kendaraan_list': kendaraan_list
-    }
-    return render(request, 'rental_app/home.html')
+    return render(request, 'rental_app/home.html', {'kendaraan_list': kendaraan_list})
 
 def login_view(request):
     if request.method == 'POST':
