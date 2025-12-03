@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <title>Profil Saya | RentalPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .card-profile {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #0d6efd, #0043a8);
+        }
+
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="{% url 'home' %}">RentalPro</a>
+            <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary rounded-pill">Kembali</a>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row g-4">
+
+            <div class="col-lg-4">
+                <div class="card card-profile shadow h-100">
+                    <div class="card-body bg-gradient-primary text-center text-white py-5">
+                        <div class="avatar-circle mb-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 class="fw-bold">{{ user.first_name }} {{ user.last_name }}</h4>
+                        <p class="mb-0 opacity-75">@{{ user.username }}</p>
+                        <span class="badge bg-light text-primary mt-3 rounded-pill px-3">Pelanggan Setia</span>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item p-3">
+                            <small class="text-muted d-block">Email</small>
+                            <span class="fw-bold text-dark">{{ user.email }}</span>
+                        </div>
+                        <div class="list-group-item p-3">
+                            <small class="text-muted d-block">Bergabung Sejak</small>
+                            <span class="fw-bold text-dark">{{ user.date_joined|date:"d M Y" }}</span>
+                        </div>
+                        <div class="list-group-item p-3">
+                            <a href="{% url 'riwayat' %}" class="btn btn-outline-primary w-100 rounded-pill">
+                                <i class="fas fa-history me-2"></i> Lihat Riwayat Pesanan
+                            </a>
+                        </div>
+                        <div class="list-group-item p-3">
+                            <a href="{% url 'ganti_password' %}" class="btn btn-outline-danger w-100 rounded-pill">
+                                <i class="fas fa-key me-2"></i> Ganti Password
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card card-profile shadow border-0">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="fas fa-user-edit me-2 text-primary"></i> Edit Data
+                            Pribadi</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        {% if messages %}
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} rounded-3 shadow-sm">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
+
+                        <form method="POST">
+                            {% csrf_token %}
+
+                            <h6 class="text-muted text-uppercase small ls-1 mb-3">Informasi Akun</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small">Nama Depan</label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Nama Belakang</label>
+                                    {{ form.last_name }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small">Alamat Email</label>
+                                    {{ form.email }}
+                                </div>
+                            </div>
+
+                            <h6 class="text-muted text-uppercase small ls-1 mb-3">Detail Kontak</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small">Nomor HP</label>
+                                    {{ form.no_telepon }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Alamat Lengkap</label>
+                                    {{ form.alamat }}
+                                </div>
+                            </div>
+
+                            <h6 class="text-muted text-uppercase small ls-1 mb-3">Dokumen Legal</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small">Nomor KTP</label>
+                                    {{ form.no_ktp }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small">Nomor SIM</label>
+                                    {{ form.no_sim }}
+                                </div>
+                            </div>
+
+                            <hr>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow">
+                                    <i class="fas fa-save me-2"></i> Simpan Perubahan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

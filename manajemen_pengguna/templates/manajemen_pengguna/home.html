@@ -224,6 +224,12 @@
                             <i class="fas fa-user-circle me-1"></i> {{ user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'profil' %}">
+                                    <i class="fas fa-user-cog me-2"></i> Profil Saya
+                                </a>
+                            </li>
+
                             <li><a class="dropdown-item" href="{% url 'riwayat' %}"><i class="fas fa-history me-2"></i>
                                     Riwayat Pesanan</a></li>
                             <li>

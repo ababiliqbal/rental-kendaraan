@@ -1,13 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 # Import Model
 from kendaraan_ext.models import Kendaraan
 from .models import Reservasi, Tagihan, Pembayaran
-from .forms import RegistrasiPelangganForm, ReservasiForm, PembayaranForm
+from .forms import RegistrasiPelangganForm, ReservasiForm, PembayaranForm, EditProfilForm
 
 # ==========================================
 # 1. HALAMAN UTAMA (HOME)
@@ -123,3 +123,50 @@ def bayar_view(request, reservasi_id):
         form = PembayaranForm(initial={'jumlah': reservasi.total_biaya})
 
     return render(request, 'manajemen_pengguna/bayar_form.html', {'form': form, 'reservasi': reservasi})
+
+@login_required(login_url='login')
+def profil_view(request):
+    profil = request.user.profil  # Ambil data profil user yg login
+    
+    if request.method == 'POST':
+        form = EditProfilForm(request.POST, instance=profil)
+        if form.is_valid():
+            # 1. Simpan data ProfilPengguna
+            form.save()
+            
+            # 2. Simpan data User (Nama & Email)
+            user = request.user
+            user.first_name = form.cleaned_data['first_name']
+            user.last_name = form.cleaned_data['last_name']
+            user.email = form.cleaned_data['email']
+            user.save()
+            
+            messages.success(request, "Profil berhasil diperbarui!")
+            return redirect('profil')
+    else:
+        # Pre-fill form dengan data saat ini
+        initial_data = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email
+        }
+        form = EditProfilForm(instance=profil, initial=initial_data)
+
+    return render(request, 'manajemen_pengguna/profil.html', {'form': form})
+
+@login_required(login_url='login')
+def ganti_password_view(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # update_session_auth_hash penting agar user TIDAK ter-logout otomatis
+            update_session_auth_hash(request, user)  
+            messages.success(request, 'Password berhasil diperbarui!')
+            return redirect('profil')
+        else:
+            messages.error(request, 'Gagal mengganti password. Periksa kesalahan di bawah.')
+    else:
+        form = PasswordChangeForm(request.user)
+    
+    return render(request, 'manajemen_pengguna/ganti_password.html', {'form': form})

@@ -13,6 +13,8 @@ urlpatterns = [
     path('booking/<int:mobil_id>/', views.booking_view, name='booking'),
     path('riwayat/', views.riwayat_view, name='riwayat'),
     path('bayar/<int:reservasi_id>/', views.bayar_view, name='bayar'),
+    path('profil/', views.profil_view, name='profil'),
+    path('ganti-password/', views.ganti_password_view, name='ganti_password'),
 ]
 
 if settings.DEBUG:

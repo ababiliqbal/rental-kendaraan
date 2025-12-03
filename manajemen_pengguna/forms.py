@@ -50,3 +50,19 @@ class PembayaranForm(forms.ModelForm):
             'jumlah': forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
             'bukti_transfer': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+class EditProfilForm(forms.ModelForm):
+    # Kita ambil field dari User (Nama Depan, Belakang, Email)
+    first_name = forms.CharField(label="Nama Depan", required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(label="Nama Belakang", required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    email = forms.EmailField(label="Email", required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
+
+    # Field dari ProfilPengguna
+    no_ktp = forms.CharField(label="Nomor KTP", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    no_sim = forms.CharField(label="Nomor SIM", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    no_telepon = forms.CharField(label="Nomor Telepon", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    alamat = forms.CharField(label="Alamat", widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3}))
+
+    class Meta:
+        model = ProfilPengguna
+        fields = ['no_ktp', 'no_sim', 'no_telepon', 'alamat']
