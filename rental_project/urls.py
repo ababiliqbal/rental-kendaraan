@@ -1,11 +1,8 @@
-# rental_project/urls.py
 from django.contrib import admin
 from django.urls import path
-from rental_app import views
-
+from manajemen_pengguna import views  # <--- GANTI rental_app JADI manajemen_pengguna
 from django.conf import settings
 from django.conf.urls.static import static 
-
 
 urlpatterns = [
     path('', views.home, name='home'), 

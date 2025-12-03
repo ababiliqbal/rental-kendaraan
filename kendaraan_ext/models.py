@@ -38,6 +38,20 @@ class Kendaraan(models.Model):
     def __str__(self):
         prefix = "[MITRA] " if self.tipe_kepemilikan == "Mitra" else ""
         return f"{prefix}{self.merk} {self.model} ({self.plat_nomor})"
+    
+    @property
+    def cek_mobil(self):
+        try:
+            return self.detail_mobil
+        except:
+            return None
+
+    @property
+    def cek_motor(self):
+        try:
+            return self.detail_motor
+        except:
+            return None
 
 # ==========================================
 # 2. EXTENSION MODELS (Mobil & Motor)

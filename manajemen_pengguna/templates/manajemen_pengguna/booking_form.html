@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sewa Kendaraan | RentalPro</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar Konsisten */
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #0d6efd !important;
+        }
+
+        /* Container Layout */
+        .booking-container {
+            margin-top: 40px;
+            margin-bottom: 80px;
+        }
+
+        /* Card Styles */
+        .card-custom {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            background: #fff;
+            overflow: hidden;
+        }
+
+        /* Bagian Kiri: Info Mobil */
+        .car-image-container {
+            position: relative;
+            height: 250px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+
+        .car-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .car-img:hover {
+            transform: scale(1.05);
+        }
+
+        .price-badge {
+            background-color: #0d6efd;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        /* Bagian Kanan: Form */
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+        }
+
+        /* Kalkulasi Harga Real-time */
+        .summary-box {
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px dashed #ced4da;
+        }
+
+        .total-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+        /* Responsive Tweaks */
+        @media (max-width: 768px) {
+            .car-image-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <i class="fas fa-car-side me-2"></i>RentalPro
+            </a>
+            <div class="d-flex">
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary rounded-pill btn-sm px-3">
+                    <i class="fas fa-arrow-left me-2"></i> Batal
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container booking-container">
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-lg-5">
+                <div class="card card-custom h-100">
+                    <div class="car-image-container">
+                        {% if mobil.gambar %}
+                        <img src="{{ mobil.gambar.url }}" class="car-img" alt="{{ mobil.merk }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+                            <i class="fas fa-image fa-3x"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="price-badge shadow-sm">
+                            Rp {{ mobil.harga_sewa_per_hari | floatformat:0 }} <span
+                                style="font-weight: 400; font-size: 0.9em;">/ hari</span>
+                        </div>
+
+                        <h3 class="fw-bold mb-1">{{ mobil.merk }} {{ mobil.model }}</h3>
+                        <p class="text-muted mb-4"><i class="fas fa-hashtag me-1"></i> {{ mobil.plat_nomor }}</p>
+
+                        <hr class="text-muted opacity-25">
+
+                        <h6 class="fw-bold text-uppercase text-muted small ls-1 mb-3">Spesifikasi Kendaraan</h6>
+                        <div class="row g-3">
+                            {% if mobil.cek_mobil %}
+                            <div class="col-6">
+                                <div class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-users text-primary me-3 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 10px;">Kapasitas</small>
+                                        <span class="fw-bold">{{ mobil.cek_mobil.jumlah_kursi }} Kursi</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-cogs text-primary me-3 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 10px;">Transmisi</small>
+                                        <span class="fw-bold">{{ mobil.cek_mobil.transmisi }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% elif mobil.cek_motor %}
+                            <div class="col-6">
+                                <div class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-motorcycle text-primary me-3 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 10px;">Tipe</small>
+                                        <span class="fw-bold">{{ mobil.cek_motor.tipe_motor }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-tachometer-alt text-primary me-3 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 10px;">Mesin</small>
+                                        <span class="fw-bold">{{ mobil.cek_motor.kapasitas_mesin_cc }} cc</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="col-6">
+                                <div class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-gas-pump text-primary me-3 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 10px;">Bahan Bakar</small>
+                                        <span class="fw-bold">Bensin</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-calendar text-primary me-3 fs-5"></i>
+                                    <div>
+                                        <small class="text-muted d-block" style="font-size: 10px;">Tahun</small>
+                                        <span class="fw-bold">{{ mobil.tahun }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card card-custom p-4">
+                    <div class="mb-4">
+                        <h4 class="fw-bold">Lengkapi Data Sewa</h4>
+                        <p class="text-muted small">Pastikan tanggal sewa sesuai dengan rencana perjalanan Anda.</p>
+                    </div>
+
+                    <form method="POST" id="bookingForm">
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Mulai</label>
+                                {{ form.tgl_mulai }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Selesai</label>
+                                {{ form.tgl_selesai }}
+                            </div>
+                        </div>
+
+                        <div class="summary-box">
+                            <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Rincian Pembayaran</h6>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Harga Sewa</span>
+                                <span class="fw-bold">Rp {{ mobil.harga_sewa_per_hari | floatformat:0 }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Durasi</span>
+                                <span class="fw-bold" id="displayDurasi">0 Hari</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-bold text-dark">Total Estimasi</span>
+                                <span class="total-price" id="displayTotal">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary w-100 btn-lg rounded-pill shadow fw-bold">
+                                <i class="fas fa-check-circle me-2"></i> Konfirmasi Booking
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="text-center mt-4 text-muted small">
+                    <i class="fas fa-shield-alt me-1"></i> Data Anda aman dan terlindungi.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 1. Styling Input Otomatis
+            const inputs = document.querySelectorAll('input[type="date"]');
+            inputs.forEach(input => {
+                input.classList.add('form-control');
+                input.style.cursor = 'pointer';
+            });
+
+            // 2. Logic Kalkulasi Harga
+            const startInput = document.querySelector('input[name="tgl_mulai"]');
+            const endInput = document.querySelector('input[name="tgl_selesai"]');
+            const displayDurasi = document.getElementById('displayDurasi');
+            const displayTotal = document.getElementById('displayTotal');
+
+            // --- SOLUSI ANTI ERROR AUTO-FORMAT ---
+            // Kita bungkus pakai tanda kutip "..." agar dianggap string oleh editor
+            // Lalu kita ubah jadi angka pakai parseFloat()
+            const hargaPerHari = parseFloat("{{ mobil.harga_sewa_per_hari }}");
+
+            function calculateTotal() {
+                const startDate = new Date(startInput.value);
+                const endDate = new Date(endInput.value);
+
+                // Pastikan kedua tanggal valid
+                if (!isNaN(startDate) && !isNaN(endDate)) {
+                    // Hitung selisih waktu (ms)
+                    const diffTime = endDate - startDate;
+                    // Konversi ke hari (1000ms * 60s * 60m * 24h)
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays > 0) {
+                        const total = diffDays * hargaPerHari;
+
+                        displayDurasi.textContent = diffDays + " Hari";
+                        // Format Rupiah
+                        displayTotal.textContent = "Rp " + total.toLocaleString('id-ID');
+
+                        displayTotal.classList.remove('text-danger');
+                        displayTotal.classList.add('text-primary');
+                    } else {
+                        displayDurasi.textContent = "0 Hari";
+                        displayTotal.textContent = "Tanggal Tidak Valid";
+                        displayTotal.classList.add('text-danger');
+                        displayTotal.classList.remove('text-primary');
+                    }
+                }
+            }
+
+            // Pasang event listener saat user mengubah tanggal
+            startInput.addEventListener('change', calculateTotal);
+            endInput.addEventListener('change', calculateTotal);
+        });
+    </script>
+</body>
+
+</html>
