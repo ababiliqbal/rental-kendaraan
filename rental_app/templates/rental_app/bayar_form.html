@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pembayaran</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">Upload Bukti Pembayaran</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Pembayaran untuk pesanan <b>#{{ reservasi.id }}</b></p>
+                        <p>Total yang harus dibayar: <b>Rp {{ reservasi.total_biaya|floatformat:0 }}</b></p>
+                        <hr>
+                        <p class="small text-muted">Silakan transfer ke BCA 123-456-789 a.n Rental Group</p>
+
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label>Jumlah Transfer</label>
+                                {{ form.jumlah }}
+                            </div>
+                            <div class="mb-3">
+                                <label>Bukti Transfer (Foto/Screenshot)</label>
+                                {{ form.bukti_transfer }}
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Kirim Bukti</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

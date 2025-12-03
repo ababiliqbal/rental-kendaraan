@@ -2,6 +2,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from .models import ProfilPengguna
+from django.forms import DateInput
+from .models import Reservasi
+from .models import Pembayaran
 
 class RegistrasiPelangganForm(forms.ModelForm):
     # Field tambahan untuk User bawaan Django
@@ -39,3 +42,21 @@ class RegistrasiPelangganForm(forms.ModelForm):
                 is_pegawai=False 
             )
         return user
+
+class ReservasiForm(forms.ModelForm):
+    class Meta:
+        model = Reservasi
+        fields = ['tgl_mulai', 'tgl_selesai']
+        widgets = {
+            'tgl_mulai': DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'tgl_selesai': DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        }
+
+class PembayaranForm(forms.ModelForm):
+    class Meta:
+        model = Pembayaran
+        fields = ['jumlah', 'bukti_transfer'] # User input jumlah & bukti
+        widgets = {
+            'jumlah': forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}), # Readonly biar gak curang
+            'bukti_transfer': forms.FileInput(attrs={'class': 'form-control'}),
+        }

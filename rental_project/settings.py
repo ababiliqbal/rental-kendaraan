@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rental_app',
+    'kendaraan_ext',
 ]
 
 MIDDLEWARE = [

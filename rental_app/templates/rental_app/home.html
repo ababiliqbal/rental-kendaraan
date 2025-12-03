@@ -22,6 +22,7 @@
             <div class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
                 <span class="nav-link text-white me-3">Halo, <b>{{ user.username }}</b></span>
+                <a class="btn btn-warning btn-sm me-2" href="{% url 'riwayat' %}">Riwayat Saya</a>
                 <a class="btn btn-danger btn-sm" href="{% url 'logout' %}">Logout</a>
                 {% else %}
                 <a class="nav-link text-white" href="{% url 'register' %}">Daftar</a>
@@ -61,11 +62,12 @@
                         <p class="card-text text-muted">Tahun {{ mobil.tahun }} • {{ mobil.warna }}</p>
 
                         <h4 class="text-primary fw-bold mb-3">
-                            Rp {{ mobil.harga_sewa | floatformat:0 }}<small class="text-muted fs-6">/hari</small>
+                            Rp {{ mobil.harga_sewa_per_hari | floatformat:0 }}<small
+                                class="text-muted fs-6">/hari</small>
                         </h4>
 
                         {% if user.is_authenticated %}
-                        <a href="#" class="btn btn-success w-100">Sewa Sekarang</a>
+                        <a href="{% url 'booking' mobil.id %}" class="btn btn-success w-100">Sewa Sekarang</a>
                         {% else %}
                         <a href="{% url 'login' %}" class="btn btn-outline-secondary w-100">Login untuk Sewa</a>
                         {% endif %}
