@@ -100,27 +100,6 @@ class ProfilPengguna(models.Model):
         role = "Pegawai" if self.is_pegawai else "Pelanggan"
         return f"{self.user.username} ({role})"
 
-class Kendaraan(models.Model):
-    JENIS_CHOICES = [('Mobil', 'Mobil'), ('Motor', 'Motor')]
-    STATUS_CHOICES = [('Tersedia', 'Tersedia'), ('Dirental', 'Dirental'), ('Perawatan', 'Perawatan')]
-    TRANSMISI_CHOICES = [('Manual', 'Manual'), ('Otomatis', 'Otomatis')]
-
-    plat_nomor = models.CharField(max_length=10, primary_key=True)
-    merk = models.CharField(max_length=50)
-    model = models.CharField(max_length=50)
-    tahun = models.IntegerField()
-    warna = models.CharField(max_length=20)
-    jenis = models.CharField(max_length=10, choices=JENIS_CHOICES)
-    harga_sewa = models.DecimalField(max_digits=10, decimal_places=0)
-    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='Tersedia')
-    gambar = models.ImageField(upload_to='kendaraan/', blank=True, null=True)
-    
-    transmisi = models.CharField(max_length=10, choices=TRANSMISI_CHOICES, null=True, blank=True)
-    jumlah_kursi = models.IntegerField(null=True, blank=True)
-    
-    def __str__(self):
-        return f"[{self.plat_nomor}] {self.merk} {self.model}"
-
 class Reservasi(models.Model):
     STATUS_RESERVASI = [
         ('Dipesan', 'Dipesan'),
