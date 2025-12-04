@@ -261,6 +261,31 @@
                 if (input.name === 'username') input.placeholder = 'Masukkan username Anda';
                 if (input.name === 'password') input.placeholder = 'Masukkan password Anda';
             });
+
+            // Handle fill admin button
+            const fillAdminBtn = document.getElementById('fill-admin-btn');
+            if (fillAdminBtn) {
+                fillAdminBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // Find username and password inputs
+                    const usernameInput = document.querySelector('input[name="username"]');
+                    const passwordInput = document.querySelector('input[name="password"]');
+                    
+                    if (usernameInput) {
+                        usernameInput.value = 'admin';
+                        usernameInput.focus();
+                    }
+                    if (passwordInput) {
+                        passwordInput.value = 'admin123';
+                    }
+                    
+                    // Change button text to indicate success
+                    fillAdminBtn.textContent = '✓ Kredensial Admin Terisi';
+                    fillAdminBtn.classList.add('btn-success');
+                    fillAdminBtn.classList.remove('btn-info');
+                    fillAdminBtn.disabled = true;
+                });
+            }
         });
     </script>
 </body>

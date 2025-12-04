@@ -26,18 +26,18 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated and user.is_staff %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'mobil_list' %}"><i class="fas fa-car"></i> Mobil</a>
+                        <a class="nav-link" href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'motor_list' %}"><i class="fas fa-motorcycle"></i> Motor</a>
+                        <a class="nav-link" href="{% url 'reporting_system:dashboard' %}"><i class="fas fa-chart-line"></i> Reports</a>
                     </li>
+                    {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'garasi_list' %}"><i class="fas fa-warehouse"></i> Garasi</a>
+                        <a class="nav-link btn btn-danger btn-sm ms-2" href="{% url 'admin_login' %}"><i class="fas fa-sign-in-alt"></i> Admin Login</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-outline-light btn-sm ms-2" href="{% url 'kendaraanext_list' %}"><i class="fas fa-tools"></i> Admin</a>
-                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

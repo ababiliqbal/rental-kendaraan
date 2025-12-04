@@ -45,7 +45,10 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Selamat datang, {username}!")
-                return redirect('home')
+                if user.is_staff:
+                    return redirect('admin_dashboard')
+                else:
+                    return redirect('home')
             else:
                 messages.error(request, "Username atau password salah.")
         else:
@@ -123,3 +126,28 @@ def bayar_view(request, reservasi_id):
         form = PembayaranForm(initial={'jumlah': reservasi.total_biaya})
 
     return render(request, 'manajemen_pengguna/bayar_form.html', {'form': form, 'reservasi': reservasi})
+
+# ==========================================
+# 4. HALAMAN ADMIN (Staff Only)
+# ==========================================
+@login_required(login_url='login')
+def admin_dashboard(request):
+    # Hanya staff yang dapat mengakses
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses ke halaman admin.")
+        return redirect('home')
+    
+    # Data untuk admin dashboard
+    total_kendaraan = Kendaraan.objects.count()
+    kendaraan_tersedia = Kendaraan.objects.filter(status='Tersedia').count()
+    kendaraan_dirental = Kendaraan.objects.filter(status='Dirental').count()
+    total_reservasi = Reservasi.objects.count()
+    
+    context = {
+        'total_kendaraan': total_kendaraan,
+        'kendaraan_tersedia': kendaraan_tersedia,
+        'kendaraan_dirental': kendaraan_dirental,
+        'total_reservasi': total_reservasi,
+    }
+    
+    return render(request, 'manajemen_pengguna/admin_dashboard.html', context)

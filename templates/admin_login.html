@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3>Admin Login</h3>
+                </div>
+                <div class="card-body p-5">
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Login Error:</strong>
+                        {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                        {% endfor %}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+
+                    <p class="text-muted text-center mb-4">
+                        <small>Kredensial admin sudah terisi. Klik tombol di bawah untuk login.</small>
+                    </p>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" 
+                                   value="{{ form.username.value|default:prefill_username }}" readonly>
+                            <small class="form-text text-muted">Sudah terisi otomatis</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control form-control-lg" id="password" name="password" 
+                                   value="{{ prefill_password }}" readonly>
+                            <small class="form-text text-muted">Sudah terisi otomatis</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger btn-lg w-100 mb-3">
+                            <i class="fas fa-sign-in-alt"></i> Login sebagai Admin
+                        </button>
+                    </form>
+
+                    <hr>
+
+                    <p class="text-center text-muted">
+                        <small>
+                            Username: <strong>testadmin</strong><br>
+                            Password: <strong>TestPass123!</strong>
+                        </small>
+                    </p>
+
+                    <div class="alert alert-info mt-3" role="alert">
+                        <strong><i class="fas fa-info-circle"></i> Informasi:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Akun ini adalah akun administrator khusus untuk reporting system</li>
+                            <li>Setelah login, Anda dapat mengakses admin panel dan reporting dashboard</li>
+                            <li>Kunjungi <a href="{% url 'reporting_system:dashboard' %}" class="alert-link">/reports/</a> untuk melihat laporan</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+    }
+    .card {
+        border-radius: 10px;
+        border: none;
+    }
+    .card-header {
+        border-radius: 10px 10px 0 0;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+    }
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        border: none;
+        font-weight: 600;
+    }
+    .btn-danger:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    }
+    .form-control:read-only {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}

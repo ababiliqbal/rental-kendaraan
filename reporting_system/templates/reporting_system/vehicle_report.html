@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Laporan Kendaraan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1><i class="fas fa-car"></i> Laporan Kendaraan</h1>
+    <p class="lead">Ringkasan status kendaraan dan tingkat penggunaan.</p>
+    <!-- Tabel data kendaraan -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Kendaraan</th>
+                <th>Status</th>
+                <th>Pemesanan</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for v in vehicles %}
+            <tr>
+                <td>{{ v.merk }} {{ v.model }}</td>
+                <td>
+                    <span class="badge bg-{% if v.status == 'Tersedia' %}success{% elif v.status == 'Dalam Perawatan' %}warning{% else %}secondary{% endif %}">
+                        {{ v.status }}
+                    </span>
+                </td>
+                <td>{{ v.booking_count|default:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-muted">Tidak ada data kendaraan</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

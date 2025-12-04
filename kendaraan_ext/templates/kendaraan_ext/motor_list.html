@@ -1,0 +1,42 @@
+{% extends "base.html" %} 
+{% load humanize %} 
+{% block title %}Daftar Motor Handal{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 text-primary border-bottom pb-2">🏍️ Motor Siap Sewa</h1>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+    {% for motor in motor_list %}
+    <div class="col">
+        <div class="card h-100 card-kendaraan shadow-sm">
+            
+            {% if motor.kendaraan.gambar %}
+            <img src="{{ motor.kendaraan.gambar.url }}" class="card-img-top" alt="Gambar Motor {{ motor.kendaraan.merek }}" style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="bg-light text-center d-flex align-items-center justify-content-center" style="height: 180px; color: #6c757d;">
+                <i class="fas fa-image fa-2x"></i>
+            </div>
+            {% endif %}
+
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-dark fw-bold mb-1">{{ motor.kendaraan.merek }} {{ motor.kendaraan.model }}</h5>
+                <p class="card-text text-muted mb-3">Tahun: **{{ motor.kendaraan.tahun }}** | **{{ motor.kendaraan.plat_nomor }}**</p>
+                
+                <ul class="list-unstyled mb-3 small">
+                    <li><i class="fas fa-tag text-info me-2"></i> Tipe: **{{ motor.tipe_motor }}**</li>
+                    <li><i class="fas fa-tachometer-alt text-info me-2"></i> Mesin: **{{ motor.kapasitas_mesin_cc }} CC**</li>
+                </ul>
+
+                <h3 class="mt-auto text-success fw-bolder">Rp {{ motor.kendaraan.harga_sewa_per_hari|floatformat:0|intcomma }}/Hari</h3>
+
+                <a href="{% url 'motor_detail' pk=motor.pk %}" class="btn btn-primary mt-2"><i class="fas fa-info-circle"></i> Detail</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info" role="alert"><i class="fas fa-exclamation-circle"></i> Maaf, tidak ada motor yang tersedia saat ini.</div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
