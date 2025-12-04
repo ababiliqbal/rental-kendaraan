@@ -2,6 +2,13 @@ from django import forms
 from django.contrib.auth.models import User
 from django.forms import DateInput
 from .models import ProfilPengguna, Reservasi, Pembayaran
+from django.core.exceptions import ValidationError
+
+def validate_file_size(value):
+    filesize = value.size
+    limit_mb = 2
+    if filesize > limit_mb * 1024 * 1024:
+        raise ValidationError(f"Ukuran file terlalu besar! Maksimal {limit_mb}MB.")
 
 class RegistrasiPelangganForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput, label="Password")
@@ -43,12 +50,22 @@ class ReservasiForm(forms.ModelForm):
         }
 
 class PembayaranForm(forms.ModelForm):
+    bukti_transfer = forms.ImageField(
+        required=True,
+        label="Upload Bukti Transfer",
+        # Validator keamanan kita pasang di sini
+        validators=[validate_file_size],
+        widget=forms.FileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*' # UX: Memfilter agar user hanya bisa pilih gambar di file explorer
+        })
+    )
+
     class Meta:
         model = Pembayaran
         fields = ['jumlah', 'bukti_transfer']
         widgets = {
             'jumlah': forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
-            'bukti_transfer': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 class EditProfilForm(forms.ModelForm):
