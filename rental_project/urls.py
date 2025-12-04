@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from manajemen_pengguna import views  # <--- GANTI rental_app JADI manajemen_pengguna
+from manajemen_pengguna import views  
 from django.conf import settings
 from django.conf.urls.static import static 
 
@@ -16,6 +16,7 @@ urlpatterns = [
     path('profil/', views.profil_view, name='profil'),
     path('ganti-password/', views.ganti_password_view, name='ganti_password'),
     path('pegawai/', include('manajemen_pegawai.urls')),
+    path('reporting/', include('manajemen_reporting.urls')), 
 ]
 
 if settings.DEBUG:
