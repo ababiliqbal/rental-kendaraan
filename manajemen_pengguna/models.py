@@ -9,20 +9,24 @@ from kendaraan_ext.models import Kendaraan
 # 1. PROFIL PENGGUNA
 # ==========================================
 class ProfilPengguna(models.Model):
+    """Model untuk profil pelanggan rental kendaraan"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profil')
     
-    # Data Diri
+    # Data Diri Pelanggan
     no_ktp = models.CharField(max_length=20, blank=True, null=True)
     no_sim = models.CharField(max_length=20, blank=True, null=True)
     no_telepon = models.CharField(max_length=15, blank=True, null=True)
     alamat = models.TextField(blank=True, null=True)
     
-    # Role (Pegawai atau Bukan)
-    is_pegawai = models.BooleanField(default=False)
-    jabatan = models.CharField(max_length=50, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Profil Pengguna"
+        verbose_name_plural = "Profil Pengguna"
     
     def __str__(self):
-        return f"{self.user.username} - {'Pegawai' if self.is_pegawai else 'Pelanggan'}"
+        return f"{self.user.get_full_name()} (Pelanggan)"
 
 # ==========================================
 # 2. RESERVASI (Transaksi Booking)

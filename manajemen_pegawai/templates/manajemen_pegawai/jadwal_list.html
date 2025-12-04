@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Jadwal Pegawai</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: auto;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fc;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .btn {
+            background: #28a745;
+            padding: 10px 14px;
+            border-radius: 6px;
+            color: white;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #1e7e34;
+        }
+        .action {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .edit {
+            color: #ffc107;
+        }
+        .delete {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Daftar Jadwal Pegawai</h2>
+
+    <a href="{% url 'jadwal_add' %}" class="btn">+ Tambah Jadwal</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Pegawai</th>
+                <th>Tanggal</th>
+                <th>Shift</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for jadwal in jadwal_list %}
+            <tr>
+                <td>{{ jadwal.pegawai.nama }}</td>
+                <td>{{ jadwal.tanggal }}</td>
+                <td>{{ jadwal.shift.nama_shift }}</td>
+                <td class="action">
+                    <a href="{% url 'jadwal_edit' jadwal.id %}" class="edit">Edit</a>
+                    <a href="{% url 'jadwal_delete' jadwal.id %}" class="delete">Hapus</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">Belum ada jadwal ditambahkan.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     
     'kendaraan_ext',     
     'manajemen_pengguna', 
+    'manajemen_pegawai',
 ]
 
 MIDDLEWARE = [
