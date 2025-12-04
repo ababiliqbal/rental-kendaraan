@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <title>Admin Dashboard | RentalPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background-color: #212529;
+            color: white;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .card-stat {
+            border: none;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .img-bukti {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .img-bukti:hover {
+            transform: scale(2);
+            z-index: 10;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="d-flex">
+        <div class="sidebar d-flex flex-column p-3" style="width: 250px;">
+            <h4 class="fw-bold mb-4 px-2"><i class="fas fa-user-shield me-2"></i> AdminPro</h4>
+            <ul class="nav flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active"><i class="fas fa-home me-2"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-globe me-2"></i> Lihat Website</a>
+                </li>
+            </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                    data-bs-toggle="dropdown">
+                    <strong>{{ user.username }}</strong>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="flex-fill p-4">
+            <h2 class="fw-bold mb-4">Dashboard Operasional</h2>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card card-stat bg-warning p-3">
+                        <h3>{{ total_pending }}</h3>
+                        <small>Menunggu Verifikasi</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-stat bg-primary p-3">
+                        <h3>{{ total_aktif }}</h3>
+                        <small>Sewa Aktif</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-warning"><i class="fas fa-file-invoice-dollar me-2"></i> Permintaan
+                        Verifikasi Pembayaran</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID Tagihan</th>
+                                <th>Pelanggan</th>
+                                <th>Total</th>
+                                <th>Bukti</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tagihan in tagihan_pending %}
+                            <tr>
+                                <td>#{{ tagihan.id }}</td>
+                                <td>{{ tagihan.reservasi.pelanggan.username }}</td>
+                                <td class="fw-bold">Rp {{ tagihan.total_akhir|floatformat:0 }}</td>
+                                <td>
+                                    {% with bayar=tagihan.riwayat_pembayaran.last %}
+                                    {% if bayar and bayar.bukti_transfer %}
+                                    <a href="{{ bayar.bukti_transfer.url }}" target="_blank">
+                                        <img src="{{ bayar.bukti_transfer.url }}" class="img-bukti rounded" width="50"
+                                            height="50" style="object-fit: cover;">
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                    {% endwith %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'verifikasi_pembayaran' tagihan.id 'terima' %}"
+                                        class="btn btn-sm btn-success"
+                                        onclick="return confirm('Terima pembayaran ini?')"><i class="fas fa-check"></i>
+                                        Terima</a>
+                                    <a href="{% url 'verifikasi_pembayaran' tagihan.id 'tolak' %}"
+                                        class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Tolak pembayaran ini?')"><i class="fas fa-times"></i>
+                                        Tolak</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-3">Tidak ada pembayaran yang perlu
+                                    diverifikasi.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-primary"><i class="fas fa-key me-2"></i> Status Sewa Kendaraan</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Unit</th>
+                                <th>Penyewa</th>
+                                <th>Jadwal</th>
+                                <th>Status Pembayaran</th>
+                                <th>Status Unit</th>
+                                <th>Aksi Operasional</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for res in reservasi_aktif %}
+                            <tr>
+                                <td>
+                                    <strong>{{ res.kendaraan.merk }}</strong><br>
+                                    <small class="text-muted">{{ res.kendaraan.plat_nomor }}</small>
+                                </td>
+                                <td>{{ res.pelanggan.first_name }} ({{ res.pelanggan.username }})</td>
+                                <td>
+                                    <small>{{ res.tgl_mulai|date:"d M" }} - {{ res.tgl_selesai|date:"d M" }}</small>
+                                </td>
+                                <td>
+                                    {% if res.tagihan.status == 'Lunas' %}
+                                    <span class="badge bg-success">Lunas</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">Belum Lunas</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if res.status == 'Dipesan' %}
+                                    <span class="badge bg-info">Booking</span>
+                                    {% elif res.status == 'Aktif' %}
+                                    <span class="badge bg-primary">Sedang Jalan</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if res.status == 'Dipesan' and res.tagihan.status == 'Lunas' %}
+                                    <a href="{% url 'update_status_pesanan' res.id 'aktif' %}"
+                                        class="btn btn-primary btn-sm w-100">
+                                        <i class="fas fa-car-side"></i> Serah Terima Kunci
+                                    </a>
+                                    {% elif res.status == 'Aktif' %}
+                                    <a href="{% url 'update_status_pesanan' res.id 'selesai' %}"
+                                        class="btn btn-warning btn-sm w-100 text-dark">
+                                        <i class="fas fa-undo"></i> Terima Kembali
+                                    </a>
+                                    {% else %}
+                                    <small class="text-muted">Menunggu Pembayaran</small>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Belum ada penyewaan aktif.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

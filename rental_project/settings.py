@@ -29,7 +29,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'kendaraan_ext',     
-    'manajemen_pengguna', 
+    'manajemen_pengguna',
+    'manajemen_pegawai', 
 ]
 
 MIDDLEWARE = [
