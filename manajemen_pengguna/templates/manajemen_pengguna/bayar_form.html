@@ -147,14 +147,45 @@
 
                 <div class="payment-card">
                     <div class="payment-header">
-                        <p class="mb-0 opacity-75 small text-uppercase ls-1">Total Tagihan</p>
-                        <h1 class="amount-display">Rp {{ reservasi.total_biaya|floatformat:0 }}</h1>
+                        <p class="mb-0 opacity-75 small text-uppercase ls-1">Yang Harus Dibayar Saat Ini</p>
+                        <h1 class="amount-display">Rp {{ sisa_tagihan|floatformat:0 }}</h1>
+
                         <span class="badge bg-white text-primary rounded-pill px-3 py-2">
-                            Order ID #{{ reservasi.id }}</span>
+                            Total Full: Rp {{ tagihan.total_akhir|floatformat:0 }}
+                        </span>
                     </div>
 
                     <div class="card-body p-4">
 
+                        {% if tagihan.total_denda > 0 or tagihan.hitung_uang_masuk > 0 %}
+                        <div class="alert alert-warning small mb-4 border-0 shadow-sm"
+                            style="background-color: #fff3cd;">
+                            <div class="d-flex justify-content-between">
+                                <span>Harga Sewa Awal:</span>
+                                <strong>Rp {{ reservasi.total_biaya|floatformat:0 }}</strong>
+                            </div>
+
+                            {% if tagihan.total_denda > 0 %}
+                            <div class="d-flex justify-content-between text-danger">
+                                <span><i class="fas fa-exclamation-circle me-1"></i> Denda/Tambahan:</span>
+                                <strong>+ Rp {{ tagihan.total_denda|floatformat:0 }}</strong>
+                            </div>
+                            {% endif %}
+
+                            {% if tagihan.hitung_uang_masuk > 0 %}
+                            <div class="d-flex justify-content-between text-success">
+                                <span><i class="fas fa-check-circle me-1"></i> Sudah Dibayar:</span>
+                                <strong>- Rp {{ tagihan.hitung_uang_masuk|floatformat:0 }}</strong>
+                            </div>
+                            {% endif %}
+
+                            <hr class="my-2 opacity-50">
+                            <div class="d-flex justify-content-between fw-bold text-dark">
+                                <span>Kekurangan:</span>
+                                <span>Rp {{ sisa_tagihan|floatformat:0 }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
                         <div class="text-center mb-4">
                             <p class="text-muted small mb-2">Silakan transfer ke rekening berikut:</p>
                             <div class="bank-info-box">
@@ -176,7 +207,7 @@
                                     <span class="input-group-text bg-light">Rp</span>
                                     {{ form.jumlah }}
                                 </div>
-                                <div class="form-text small">Nominal harus sesuai dengan total tagihan.</div>
+                                <div class="form-text small">Pastikan nominal sesuai dengan kekurangan pembayaran.</div>
                             </div>
 
                             <div class="mb-4">
@@ -184,6 +215,11 @@
                                 {{ form.bukti_transfer }}
                                 <div class="form-text small"><i class="fas fa-info-circle me-1"></i> Format: JPG, PNG,
                                     atau PDF (Max 2MB)</div>
+                                {% if form.bukti_transfer.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.bukti_transfer.errors }}
+                                </div>
+                                {% endif %}
                             </div>
 
                             <button type="submit" class="btn btn-primary w-100 btn-upload">

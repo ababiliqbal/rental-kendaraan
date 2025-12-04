@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <title>{{ title }} | AdminPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-light">
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0 fw-bold"><i class="fas {{ icon }} me-2"></i> {{ title }}</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <h6 class="text-primary fw-bold text-uppercase small ls-1 mb-3">Informasi Umum</h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Plat Nomor</label>
+                                    {{ k_form.plat_nomor }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Tahun Pembuatan</label>
+                                    {{ k_form.tahun }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Merk</label>
+                                    {{ k_form.merk }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Model/Tipe</label>
+                                    {{ k_form.model }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Harga Sewa (Per Hari)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp</span>
+                                        {{ k_form.harga_sewa_per_hari }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">Status Awal</label>
+                                    {{ k_form.status }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">Foto Kendaraan</label>
+                                    {% if k_form.instance.gambar %}
+                                    <div class="mb-2">
+                                        <img src="{{ k_form.instance.gambar.url }}" class="img-thumbnail"
+                                            style="height: 100px;">
+                                        <span class="text-muted small ms-2">Gambar Saat Ini</span>
+                                    </div>
+                                    {% endif %}
+
+                                    {{ k_form.gambar }}
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h6 class="text-primary fw-bold text-uppercase small ls-1 mb-3">Spesifikasi Detail</h6>
+                            <div class="row g-3">
+                                {% for field in m_form %}
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold">{{ field.label }}</label>
+                                    {{ field }}
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <a href="{% url 'daftar_armada' %}" class="btn btn-light border">Batal</a>
+
+                                <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                    {% if is_edit %}
+                                    <i class="fas fa-sync-alt me-2"></i> Update Perubahan
+                                    {% else %}
+                                    <i class="fas fa-save me-2"></i> Simpan Data
+                                    {% endif %}
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

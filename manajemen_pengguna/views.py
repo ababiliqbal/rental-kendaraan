@@ -3,10 +3,11 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum # <--- Wajib tambah ini di paling atas file
 
 # Import Model
 from kendaraan_ext.models import Kendaraan
-from .models import Reservasi, Tagihan, Pembayaran
+from .models import Reservasi, Tagihan, Pembayaran, ProfilPengguna
 from .forms import RegistrasiPelangganForm, ReservasiForm, PembayaranForm, EditProfilForm
 
 # ==========================================
@@ -100,10 +101,14 @@ def riwayat_view(request):
 def bayar_view(request, reservasi_id):
     reservasi = get_object_or_404(Reservasi, id=reservasi_id, pelanggan=request.user)
     
+    # Ambil tagihan
     tagihan, created = Tagihan.objects.get_or_create(
         reservasi=reservasi,
         defaults={'total_akhir': reservasi.total_biaya} 
     )
+    
+    # LOGIKA BARU: Hitung Sisa Bayar
+    sisa_tagihan = tagihan.sisa_bayar()
 
     if request.method == 'POST':
         form = PembayaranForm(request.POST, request.FILES)
@@ -111,22 +116,36 @@ def bayar_view(request, reservasi_id):
             pembayaran = form.save(commit=False)
             pembayaran.tagihan = tagihan
             pembayaran.metode = 'Transfer'
+            
+            # Validasi Logic: Jangan biarkan user bayar 0 atau negatif
+            if pembayaran.jumlah <= 0:
+                messages.error(request, "Jumlah pembayaran tidak valid.")
+                return redirect('bayar', reservasi_id=reservasi.id)
+
             pembayaran.save()
             
-            # Update status jadi Menunggu Verifikasi
             tagihan.status = 'Menunggu Verifikasi'
             tagihan.save()
             
-            messages.success(request, "Bukti transfer berhasil diupload!")
+            messages.success(request, "Bukti pembayaran berhasil dikirim!")
             return redirect('riwayat')
     else:
-        form = PembayaranForm(initial={'jumlah': reservasi.total_biaya})
+        # PRE-FILL FORM DENGAN SISA TAGIHAN (BUKAN TOTAL BIAYA LAGI)
+        # Jika sisa < 0 (aneh), set 0. Jika > 0, set sisa.
+        nilai_awal = sisa_tagihan if sisa_tagihan > 0 else 0
+        form = PembayaranForm(initial={'jumlah': nilai_awal})
 
-    return render(request, 'manajemen_pengguna/bayar_form.html', {'form': form, 'reservasi': reservasi})
+    context = {
+        'form': form, 
+        'reservasi': reservasi,
+        'tagihan': tagihan,          # Kirim objek tagihan ke template
+        'sisa_tagihan': sisa_tagihan # Kirim angka sisa ke template
+    }
+    return render(request, 'manajemen_pengguna/bayar_form.html', context)
 
 @login_required(login_url='login')
 def profil_view(request):
-    profil = request.user.profil  # Ambil data profil user yg login
+    profil, created = ProfilPengguna.objects.get_or_create(user=request.user)
     
     if request.method == 'POST':
         form = EditProfilForm(request.POST, instance=profil)

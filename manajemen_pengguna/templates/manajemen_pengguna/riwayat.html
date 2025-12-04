@@ -232,8 +232,21 @@
 
                         <div class="col-md-3 p-4 d-flex flex-column justify-content-center align-items-md-end bg-white">
                             <div class="text-md-end mb-3">
-                                <small class="text-muted d-block">Total Biaya</small>
+                                <small class="text-muted d-block">Total Tagihan</small>
+
+                                {% if res.cek_tagihan %}
+                                <span class="price-text">Rp {{ res.cek_tagihan.total_akhir|floatformat:0 }}</span>
+
+                                {% if res.cek_tagihan.total_denda > 0 %}
+                                <div class="text-danger small fw-bold mt-1" style="font-size: 11px;">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    Termasuk Denda: Rp {{ res.cek_tagihan.total_denda|floatformat:0 }}
+                                </div>
+                                {% endif %}
+
+                                {% else %}
                                 <span class="price-text">Rp {{ res.total_biaya|floatformat:0 }}</span>
+                                {% endif %}
                             </div>
 
                             <div class="d-flex align-items-center gap-3">

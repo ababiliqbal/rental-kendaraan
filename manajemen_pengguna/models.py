@@ -4,6 +4,7 @@ from django.utils import timezone
 
 # Kita import Kendaraan dari app sebelah
 from kendaraan_ext.models import Kendaraan
+from django.db.models import Sum
 
 # ==========================================
 # 1. PROFIL PENGGUNA
@@ -80,6 +81,13 @@ class Tagihan(models.Model):
     
     status = models.CharField(max_length=20, choices=STATUS_BAYAR, default='Belum Lunas')
     
+    def hitung_uang_masuk(self):
+        total = self.riwayat_pembayaran.aggregate(Sum('jumlah'))['jumlah__sum']
+        return total if total else 0
+
+    def sisa_bayar(self):
+        return self.total_akhir - self.hitung_uang_masuk()
+    
     def __str__(self):
         return f"Tagihan #{self.id} ({self.status})"
 
@@ -99,3 +107,16 @@ class Pembayaran(models.Model):
     
     def __str__(self):
         return f"Bayar Rp {self.jumlah} - {self.metode}"
+    
+# manajemen_pengguna/models.py
+
+# ... (kode class Pembayaran yang sudah ada) ...
+
+class Denda(models.Model):
+    tagihan = models.ForeignKey(Tagihan, on_delete=models.CASCADE, related_name='daftar_denda')
+    jenis = models.CharField(max_length=50) # Contoh: "Keterlambatan", "Lecet Bumper"
+    jumlah = models.DecimalField(max_digits=12, decimal_places=0)
+    keterangan = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"{self.jenis} - Rp {self.jumlah}"
