@@ -1,0 +1,52 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Detail Kendaraan - {{ kendaraan.plat_nomor }}{% endblock %}
+
+{% block content %}
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card card-elevated p-3">
+        {% if kendaraan.gambar %}
+          <img src="{{ kendaraan.gambar.url }}" class="img-fluid rounded" alt="{{ kendaraan }}">
+        {% else %}
+          <div class="text-center py-5 muted-small">Tidak ada gambar</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="col-lg-7">
+      <div class="card card-elevated p-4">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h3 class="mb-1">{{ kendaraan.merk }} {{ kendaraan.model }}</h3>
+            <div class="muted-small">Plat: {{ kendaraan.plat_nomor }}</div>
+          </div>
+          <div>
+            {% if kendaraan.status == 'Tersedia' %}
+              <span class="status-pill bg-success bg-opacity-10 text-success">{{ kendaraan.status }}</span>
+            {% elif kendaraan.status == 'Dirental' %}
+              <span class="status-pill bg-danger bg-opacity-10 text-danger">{{ kendaraan.status }}</span>
+            {% else %}
+              <span class="status-pill bg-warning bg-opacity-10 text-warning">{{ kendaraan.status }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <hr>
+        <div class="row">
+          <div class="col-6 muted-small">Tahun</div>
+          <div class="col-6 text-end">{{ kendaraan.tahun }}</div>
+          <div class="col-6 muted-small">Harga / hari</div>
+          <div class="col-6 text-end">Rp {{ kendaraan.harga_sewa_per_hari }}</div>
+          <div class="col-6 muted-small">Kepemilikan</div>
+          <div class="col-6 text-end">{{ kendaraan.tipe_kepemilikan }}</div>
+        </div>
+
+        <div class="mt-4 d-flex gap-2">
+          <a class="btn btn-primary" href="{% url 'kendaraan:edit_kendaraan' kendaraan.pk %}">Edit</a>
+          <a class="btn btn-danger" href="{% url 'kendaraan:hapus_kendaraan' kendaraan.pk %}">Hapus</a>
+          <a class="btn btn-outline-secondary" href="{% url 'kendaraan:daftar_kendaraan' %}">Kembali</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

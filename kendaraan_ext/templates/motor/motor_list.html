@@ -1,0 +1,35 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Daftar Motor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-0">Daftar Motor</h3>
+            <div class="muted-small">Kelola data motor</div>
+        </div>
+        <a href="{% url 'kendaraan:motor_create' %}" class="btn btn-light btn-outline-primary">Tambah Motor</a>
+    </div>
+
+    <div class="row g-3">
+        {% for motor in daftar_motor %}
+            <div class="col-md-6">
+                <div class="card card-elevated p-3 d-flex justify-content-between">
+                    <div>
+                        <h5 class="mb-1">{{ motor.kendaraan }}</h5>
+                        <div class="muted-small">Kapasitas: {{ motor.kapasitas_mesin_cc }} cc</div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <a class="btn btn-sm btn-primary" href="{% url 'kendaraan:motor_detail' motor.pk %}">Detail</a>
+                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'kendaraan:motor_update' motor.pk %}">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'kendaraan:motor_delete' motor.pk %}">Hapus</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12"><div class="alert alert-info">Tidak ada data Motor.</div></div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

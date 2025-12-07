@@ -1,0 +1,14 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Hapus Motor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Hapus Motor</h2>
+    <p>Yakin ingin menghapus <strong>{{ motor.kendaraan }}</strong>?</p>
+    <form method="post">{% csrf_token %}
+        <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+        <a href="{% url 'kendaraan:motor_detail' motor.pk %}" class="btn btn-secondary">Batal</a>
+    </form>
+</div>
+{% endblock %}

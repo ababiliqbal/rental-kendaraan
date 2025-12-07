@@ -1,0 +1,56 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Form Kendaraan{% endblock %}
+
+{% block content %}
+  <div class="card card-elevated p-4">
+    <h1 class="h4 mb-3">{% if is_edit %}Edit Kendaraan{% else %}Tambah Kendaraan{% endif %}</h1>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="row">
+        {% for field in kendaraan_form %}
+          <div class="col-md-6 mb-3">{{ field.label_tag }}{{ field }}{% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}</div>
+        {% endfor %}
+      </div>
+
+      {% if not is_edit %}
+        <hr>
+        <div class="mb-3">
+          <label class="form-label"><strong>Tipe Kendaraan</strong></label>
+          <select id="id_tipe_kendaraan" name="tipe_kendaraan" class="form-select">
+            <option value="">-- Pilih --</option>
+            <option value="Mobil">Mobil</option>
+            <option value="Motor">Motor</option>
+          </select>
+        </div>
+
+        <div id="mobil-form" style="display:none" class="mb-3 card p-3">
+          <h6 class="mb-2">Detail Mobil</h6>
+          <div class="row">{% for f in mobil_form %}<div class="col-md-6 mb-2">{{ f.label_tag }}{{ f }}</div>{% endfor %}</div>
+        </div>
+
+        <div id="motor-form" style="display:none" class="mb-3 card p-3">
+          <h6 class="mb-2">Detail Motor</h6>
+          <div class="row">{% for f in motor_form %}<div class="col-md-6 mb-2">{{ f.label_tag }}{{ f }}</div>{% endfor %}</div>
+        </div>
+
+        <script>
+          (function(){
+            const sel = document.getElementById('id_tipe_kendaraan');
+            function toggle(){
+              const v = sel.value;
+              document.getElementById('mobil-form').style.display = v==='Mobil' ? 'block' : 'none';
+              document.getElementById('motor-form').style.display = v==='Motor' ? 'block' : 'none';
+            }
+            if(sel){ sel.addEventListener('change', toggle); document.addEventListener('DOMContentLoaded', toggle); }
+          })();
+        </script>
+      {% endif %}
+
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-primary" type="submit">Simpan</button>
+        <a class="btn btn-outline-secondary" href="{% if is_edit %}{% url 'kendaraan:detail_kendaraan' kendaraan.pk %}{% else %}{% url 'kendaraan:daftar_kendaraan' %}{% endif %}">Batal</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

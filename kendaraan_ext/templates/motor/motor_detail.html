@@ -1,0 +1,16 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Detail Motor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detail Motor: {{ motor.kendaraan }}</h2>
+    <p>Tipe Motor: {{ motor.tipe_motor }}</p>
+    <p>Kapasitas Mesin: {{ motor.kapasitas_mesin_cc }} cc</p>
+    <p>
+        <a href="{% url 'kendaraan:motor_update' motor.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'kendaraan:motor_delete' motor.pk %}" class="btn btn-danger">Hapus</a>
+        <a href="{% url 'kendaraan:motor_list' %}" class="btn btn-secondary">Kembali</a>
+    </p>
+</div>
+{% endblock %}

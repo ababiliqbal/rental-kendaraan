@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-
-class RentalAppConfig(AppConfig):
+class KendaraanExtConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'rental_app'
+    name = 'kendaraan_ext'
+
