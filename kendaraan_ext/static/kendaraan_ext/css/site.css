@@ -1,0 +1,60 @@
+:root {
+    --bg: #f7f9fc;
+    --card: #ffffff;
+    --muted: #6c757d;
+    --primary: #0d6efd;
+    --radius: 12px;
+    --shadow: 0 8px 20px rgba(13,110,253,0.06);
+}
+
+* { box-sizing: border-box; }
+html,body { height:100%; }
+body {
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    background: var(--bg);
+    color: #212529;
+    padding-top: 70px;
+}
+
+.site-hero { background: linear-gradient(180deg, rgba(13,110,253,0.06), transparent 60%); }
+.site-hero h1 { font-weight:700; color:#0f1724; }
+.site-hero p { color: var(--muted); }
+
+.navbar { border-bottom: 1px solid rgba(16,24,40,0.04); }
+.navbar .navbar-brand { font-size:1.15rem; display:flex; gap:.5rem; align-items:center; }
+
+.card-kendaraan {
+    background: var(--card);
+    border: none;
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: transform .22s ease, box-shadow .22s ease;
+    box-shadow: 0 6px 18px rgba(15,23,42,0.04);
+}
+.card-kendaraan:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+.card-kendaraan .card-body { padding: 1rem; }
+.card-kendaraan .card-title { font-weight:600; margin-bottom:.25rem; }
+.card-kendaraan .card-text { color: var(--muted); font-size:.95rem; }
+
+.vehicle-grid { gap:1.4rem; }
+
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary), #0069df);
+    border: none;
+    box-shadow: 0 6px 18px rgba(13,110,253,0.12);
+}
+.btn-outline-secondary { border-radius: 8px; }
+
+.site-footer { background: #fff; border-top: 1px solid rgba(16,24,40,0.04); color: #394149; }
+.site-footer a { color: inherit; opacity:.85; }
+
+/* Forms */
+.form-control { border-radius: 8px; }
+
+/* Responsive tweaks */
+@media (max-width: 767px) {
+    .site-hero { padding: 2rem 0; }
+    .navbar { padding: .5rem 1rem; }
+}
+
+.text-muted { color: var(--muted) !important; }

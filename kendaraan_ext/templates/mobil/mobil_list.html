@@ -1,0 +1,35 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Daftar Mobil{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h3 class="mb-0">Daftar Mobil</h3>
+            <div class="muted-small">Kelola data mobil</div>
+        </div>
+        <a href="{% url 'kendaraan:mobil_create' %}" class="btn btn-light btn-outline-primary">Tambah Mobil</a>
+    </div>
+
+    <div class="row g-3">
+        {% for mobil in daftar_mobil %}
+            <div class="col-md-6">
+                <div class="card card-elevated p-3 d-flex justify-content-between">
+                    <div>
+                        <h5 class="mb-1">{{ mobil.kendaraan }}</h5>
+                        <div class="muted-small">Transmisi: {{ mobil.transmisi }}</div>
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
+                        <a class="btn btn-sm btn-primary" href="{% url 'kendaraan:mobil_detail' mobil.pk %}">Detail</a>
+                        <a class="btn btn-sm btn-outline-secondary" href="{% url 'kendaraan:mobil_update' mobil.pk %}">Edit</a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'kendaraan:mobil_delete' mobil.pk %}">Hapus</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12"><div class="alert alert-info">Tidak ada data Mobil.</div></div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

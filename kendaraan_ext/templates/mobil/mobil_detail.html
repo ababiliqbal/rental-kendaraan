@@ -1,0 +1,16 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Detail Mobil{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detail Mobil: {{ mobil.kendaraan }}</h2>
+    <p>Jumlah Kursi: {{ mobil.jumlah_kursi }}</p>
+    <p>Transmisi: {{ mobil.transmisi }}</p>
+    <p>
+        <a href="{% url 'kendaraan:mobil_update' mobil.pk %}" class="btn btn-primary">Edit</a>
+        <a href="{% url 'kendaraan:mobil_delete' mobil.pk %}" class="btn btn-danger">Hapus</a>
+        <a href="{% url 'kendaraan:mobil_list' %}" class="btn btn-secondary">Kembali</a>
+    </p>
+</div>
+{% endblock %}

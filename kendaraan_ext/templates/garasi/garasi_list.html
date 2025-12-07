@@ -1,0 +1,41 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Daftar Garasi{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h1 class="h3 mb-0">Daftar Garasi</h1>
+    <div class="muted-small">Kelola lokasi dan armada di setiap garasi</div>
+  </div>
+  <div>
+    <a href="{% url 'kendaraan:garasi_create' %}" class="btn btn-light btn-outline-primary">Tambah Garasi</a>
+  </div>
+</div>
+
+<div class="row g-4">
+  {% for garasi in daftar_garasi %}
+    <div class="col-md-6">
+      <div class="card card-elevated p-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="mb-1">{{ garasi.lokasi }}</h5>
+            <div class="muted-small">{{ garasi.kendaraan.count }} kendaraan terdaftar</div>
+          </div>
+          <div class="text-end">
+            <a class="btn btn-sm btn-primary mb-2" href="{% url 'kendaraan:garasi_detail' garasi.pk %}">Detail</a>
+            <div>
+              <a href="{% url 'kendaraan:garasi_update' garasi.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+              <a href="{% url 'kendaraan:garasi_delete' garasi.pk %}" class="btn btn-sm btn-outline-danger">Hapus</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <div class="alert alert-info">Belum ada data garasi. Tambah garasi baru untuk mulai mengelola armada.</div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

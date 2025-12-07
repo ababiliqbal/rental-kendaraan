@@ -1,0 +1,16 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}Hapus Kendaraan{% endblock %}
+
+{% block content %}
+  <div class="card card-elevated p-4 text-center">
+    <h2 class="mb-3">Konfirmasi Hapus</h2>
+    <p class="mb-3">Apakah Anda yakin ingin menghapus <strong>{{ kendaraan }}</strong>?</p>
+    <form method="post">{% csrf_token %}
+      <div class="d-flex gap-2 justify-content-center">
+        <button type="submit" class="btn btn-danger">Ya, Hapus</button>
+        <a class="btn btn-outline-secondary" href="{% url 'kendaraan:detail_kendaraan' kendaraan.pk %}">Batal</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

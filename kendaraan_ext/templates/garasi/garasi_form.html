@@ -1,0 +1,68 @@
+{% extends 'kendaraan/base_kendaraan.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit{% else %}Tambah{% endif %} Garasi
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h3 class="mb-0">{% if form.instance.pk %}Edit Garasi{% else %}Tambah Garasi{% endif %}</h3>
+      <div class="muted-small">Atur lokasi garasi dan pilih armada yang terkait</div>
+    </div>
+    <div>
+      <a href="{% url 'kendaraan:garasi_list' %}" class="btn btn-outline-secondary btn-sm">Kembali</a>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card card-elevated p-4">
+
+        <form method="post">
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <strong>Terjadi Kesalahan:</strong>
+              {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label"><strong>{{ form.lokasi.label }}</strong></label>
+            {{ form.lokasi }}
+            {% if form.lokasi.errors %}
+              <div class="text-danger small">{{ form.lokasi.errors }}</div>
+            {% endif %}
+          </div>
+
+          <hr>
+
+          <div class="mb-3">
+            <label class="form-label"><strong>Daftar Kendaraan</strong></label>
+            <div class="border rounded p-3" style="max-height:260px; overflow:auto;">
+              {{ form.kendaraan }}
+            </div>
+            {% if form.kendaraan.errors %}
+              <div class="text-danger small mt-2">{{ form.kendaraan.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Simpan Garasi</button>
+            <a class="btn btn-outline-secondary" href="{% url 'kendaraan:garasi_list' %}">Batal</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
