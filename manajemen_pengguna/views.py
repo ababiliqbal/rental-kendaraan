@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum # <--- Wajib tambah ini di paling atas file
+from django.db.models import Sum, Q # <--- Wajib tambah ini di paling atas file
 
 # Import Model
 from kendaraan_ext.models import Kendaraan
@@ -14,12 +14,31 @@ from .forms import RegistrasiPelangganForm, ReservasiForm, PembayaranForm, EditP
 # 1. HALAMAN UTAMA (HOME)
 # ==========================================
 def home(request):
-    # Menampilkan mobil yang tersedia
-    kendaraan_list = Kendaraan.objects.filter(status='Tersedia')
+    query = request.GET.get('q')          
+    kategori = request.GET.get('kategori')
+
+    kendaraan_list = Kendaraan.objects.filter(status='Tersedia').order_by('-id')
+
+    if kategori == 'mobil':
+
+        kendaraan_list = kendaraan_list.filter(detail_mobil__isnull=False)
+    elif kategori == 'motor':
+
+        kendaraan_list = kendaraan_list.filter(detail_motor__isnull=False)
+
+    if query:
+
+        kendaraan_list = kendaraan_list.filter(
+            Q(merk__icontains=query) | 
+            Q(model__icontains=query) |
+            Q(plat_nomor__icontains=query)
+        )
+
     context = {
-        'kendaraan_list': kendaraan_list
+        'kendaraan_list': kendaraan_list,
+        'request_q': query, 
+        'request_kategori': kategori
     }
-    # Perhatikan nama foldernya: 'manajemen_pengguna/home.html'
     return render(request, 'manajemen_pengguna/home.html', context)
 
 # ==========================================
