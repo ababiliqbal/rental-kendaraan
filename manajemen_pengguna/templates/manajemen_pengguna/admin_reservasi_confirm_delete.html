@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Hapus Reservasi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger shadow">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+        </div>
+        <div class="card-body">
+            <p>Anda yakin ingin menghapus reservasi berikut?</p>
+            <div class="alert alert-warning">
+                <strong>#{{ reservasi.id }}</strong><br>
+                {{ reservasi.pelanggan.username }} - {{ reservasi.kendaraan.plat_nomor }}<br>
+                Periode: {{ reservasi.tgl_mulai }} s/d {{ reservasi.tgl_selesai }}
+            </div>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> Ya, Hapus</button>
+            </form>
+            <a href="{% url 'admin_reservasi_list' %}" class="btn btn-secondary"><i class="fas fa-times"></i> Batal</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

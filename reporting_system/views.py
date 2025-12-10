@@ -1,19 +1,26 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import permission_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Count, Sum, Q
-from django.utils import timezone
 from datetime import timedelta
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.models import User
+from django.db.models import Count, Sum, Q
 from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
-from .models import (
-    Report, RevenueReport, BookingReport, VehicleReport, 
-    UserReport, MaintenanceReport
-)
 from kendaraan_ext.models import Kendaraan
 from manajemen_pengguna.models import Reservasi
-from django.contrib.auth.models import User
+
+from .forms import CreateReportForm, ReportFilterForm
+from .models import (
+    Report,
+    RevenueReport,
+    BookingReport,
+    VehicleReport,
+    UserReport,
+    MaintenanceReport,
+)
 
 
 @staff_member_required
@@ -194,10 +201,27 @@ def user_report(request):
 @staff_member_required
 def report_list(request):
     """View untuk menampilkan daftar laporan"""
-    reports = Report.objects.filter(created_by=request.user).order_by('-created_date')
-    
+    filter_form = ReportFilterForm(request.GET or None)
+    reports = Report.objects.all().order_by('-created_date')
+
+    if filter_form.is_valid():
+        report_type = filter_form.cleaned_data.get('report_type')
+        status = filter_form.cleaned_data.get('status')
+        start_date = filter_form.cleaned_data.get('start_date')
+        end_date = filter_form.cleaned_data.get('end_date')
+
+        if report_type:
+            reports = reports.filter(report_type=report_type)
+        if status:
+            reports = reports.filter(status=status)
+        if start_date:
+            reports = reports.filter(created_date__date__gte=start_date)
+        if end_date:
+            reports = reports.filter(created_date__date__lte=end_date)
+
     context = {
         'reports': reports,
+        'filter_form': filter_form,
     }
     return render(request, 'reporting_system/report_list.html', context)
 
@@ -205,8 +229,8 @@ def report_list(request):
 @staff_member_required
 def report_detail(request, pk):
     """View untuk menampilkan detail laporan"""
-    report = get_object_or_404(Report, pk=pk, created_by=request.user)
-    
+    report = get_object_or_404(Report, pk=pk)
+
     context = {
         'report': report,
     }
@@ -217,7 +241,7 @@ def report_detail(request, pk):
 @permission_required('reporting_system.delete_report', raise_exception=True)
 def report_delete(request, pk):
     """View untuk menghapus laporan"""
-    report = get_object_or_404(Report, pk=pk, created_by=request.user)
+    report = get_object_or_404(Report, pk=pk)
     
     if request.method == 'POST':
         report.delete()
@@ -227,3 +251,51 @@ def report_delete(request, pk):
         'report': report,
     }
     return render(request, 'reporting_system/report_confirm_delete.html', context)
+
+
+@staff_member_required
+@permission_required('reporting_system.add_report', raise_exception=True)
+@require_http_methods(["GET", "POST"])
+def report_create(request):
+    """Form untuk membuat laporan baru"""
+    if request.method == 'POST':
+        form = CreateReportForm(request.POST, request.FILES)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.created_by = request.user
+            report.save()
+            return redirect('reporting_system:report_detail', pk=report.pk)
+    else:
+        form = CreateReportForm()
+
+    context = {
+        'form': form,
+        'mode': 'create',
+    }
+    return render(request, 'reporting_system/report_form.html', context)
+
+
+@staff_member_required
+@permission_required('reporting_system.change_report', raise_exception=True)
+@require_http_methods(["GET", "POST"])
+def report_update(request, pk):
+    """Form untuk memperbarui laporan"""
+    report = get_object_or_404(Report, pk=pk)
+
+    if request.method == 'POST':
+        form = CreateReportForm(request.POST, request.FILES, instance=report)
+        if form.is_valid():
+            updated_report = form.save(commit=False)
+            if not updated_report.created_by:
+                updated_report.created_by = request.user
+            updated_report.save()
+            return redirect('reporting_system:report_detail', pk=updated_report.pk)
+    else:
+        form = CreateReportForm(instance=report)
+
+    context = {
+        'form': form,
+        'mode': 'update',
+        'report': report,
+    }
+    return render(request, 'reporting_system/report_form.html', context)

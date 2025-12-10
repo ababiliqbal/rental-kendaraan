@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'update' %}Edit Kendaraan{% else %}Tambah Kendaraan{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="mb-3">
+        <h1 class="h3"><i class="fas fa-car"></i> {% if mode == 'update' %}Edit{% else %}Tambah{% endif %} Kendaraan</h1>
+        <p class="text-muted">Lengkapi detail kendaraan rental.</p>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-4">{{ form.plat_nomor.label_tag }}{{ form.plat_nomor }}</div>
+                <div class="col-md-4">{{ form.merk.label_tag }}{{ form.merk }}</div>
+                <div class="col-md-4">{{ form.model.label_tag }}{{ form.model }}</div>
+                <div class="col-md-3">{{ form.tahun.label_tag }}{{ form.tahun }}</div>
+                <div class="col-md-3">{{ form.harga_sewa_per_hari.label_tag }}{{ form.harga_sewa_per_hari }}</div>
+                <div class="col-md-3">{{ form.status.label_tag }}{{ form.status }}</div>
+                <div class="col-md-3">{{ form.gambar.label_tag }}{{ form.gambar }}</div>
+                <div class="col-md-4">{{ form.tipe_kepemilikan.label_tag }}{{ form.tipe_kepemilikan }}</div>
+                <div class="col-md-4">{{ form.id_mitra.label_tag }}{{ form.id_mitra }}</div>
+                <div class="col-md-4">{{ form.persen_bagi_hasil.label_tag }}{{ form.persen_bagi_hasil }}</div>
+                <div class="col-12 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
+                    <a href="{% url 'admin_kendaraan_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

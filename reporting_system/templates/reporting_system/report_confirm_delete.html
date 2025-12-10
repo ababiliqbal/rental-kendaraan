@@ -13,9 +13,11 @@
                 <div class="card-body">
                     <p class="text-muted">Anda akan menghapus laporan berikut:</p>
                     <div class="alert alert-warning" role="alert">
-                        <strong>{{ object.title }}</strong>
+                        <strong>{{ report.title }}</strong>
                         <br>
-                        <small>Tipe: {{ object.get_report_type_display }}</small>
+                        <small>Tipe: {{ report.get_report_type_display }}</small>
+                        <br>
+                        <small>Dibuat: {{ report.created_date|date:"d/m/Y H:i" }}</small>
                     </div>
                     <p class="text-danger"><strong>Tindakan ini tidak dapat dibatalkan!</strong></p>
                 </div>

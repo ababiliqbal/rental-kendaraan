@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Laporan Pendapatan{% endblock %}
 
@@ -43,7 +44,7 @@
             <div class="card bg-success text-white shadow">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fas fa-coins"></i> Total Pendapatan</h5>
-                    <h2>Rp{{ stats.total_revenue|floatformat:0 }}</h2>
+                    <h2>Rp {{ stats.total_revenue|floatformat:0|intcomma }}</h2>
                 </div>
             </div>
         </div>
@@ -78,7 +79,7 @@
             <div class="card bg-warning text-dark shadow">
                 <div class="card-body">
                     <h5 class="card-title"><i class="fas fa-chart-bar"></i> Nilai Rata-rata Pemesanan</h5>
-                    <h2>Rp{{ stats.average_booking_value|floatformat:0 }}</h2>
+                    <h2>Rp {{ stats.average_booking_value|floatformat:0|intcomma }}</h2>
                 </div>
             </div>
         </div>
@@ -120,7 +121,7 @@
                                         {{ reservasi.get_status_display }}
                                     </span>
                                 </td>
-                                <td>Rp{{ reservasi.total_biaya|floatformat:0 }}</td>
+                                <td>Rp {{ reservasi.total_biaya|floatformat:0|intcomma }}</td>
                                 <td>{{ reservasi.created_at|date:"d/m/Y" }}</td>
                             </tr>
                             {% empty %}

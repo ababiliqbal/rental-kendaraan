@@ -58,28 +58,28 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <div class="card text-decoration-none text-muted border-2 border-secondary p-4 text-center shadow-sm" style="background-color: #f5f5f5; opacity: 0.6; cursor: not-allowed;">
+                            <a href="{% url 'admin_kendaraan_list' %}" class="card text-decoration-none text-dark border-2 border-primary p-4 text-center shadow-sm hover-shadow" style="transition: all 0.3s;">
                                 <div>
-                                    <i class="fas fa-car fa-3x mb-3" style="color: #ccc;"></i>
-                                    <h5>Kelola Kendaraan</h5>
-                                    <p class="text-muted"><small><i class="fas fa-lock"></i> Dalam Pengembangan</small></p>
+                                    <i class="fas fa-car fa-3x text-primary mb-3"></i>
+                                    <h5 class="text-primary">Kelola Kendaraan</h5>
+                                    <p class="text-muted">Tambah, edit, hapus kendaraan</p>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <div class="card text-decoration-none text-muted border-2 border-secondary p-4 text-center shadow-sm" style="background-color: #f5f5f5; opacity: 0.6; cursor: not-allowed;">
+                            <a href="{% url 'admin_reservasi_list' %}" class="card text-decoration-none text-dark border-2 border-warning p-4 text-center shadow-sm hover-shadow" style="transition: all 0.3s;">
                                 <div>
-                                    <i class="fas fa-calendar-alt fa-3x mb-3" style="color: #ccc;"></i>
-                                    <h5>Kelola Pemesanan</h5>
-                                    <p class="text-muted"><small><i class="fas fa-lock"></i> Dalam Pengembangan</small></p>
+                                    <i class="fas fa-calendar-alt fa-3x text-warning mb-3"></i>
+                                    <h5 class="text-warning">Kelola Pemesanan</h5>
+                                    <p class="text-muted">Pantau & ubah status reservasi</p>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-3">
                             <a href="{% url 'reporting_system:dashboard' %}" class="card text-decoration-none text-dark border-2 border-success p-4 text-center shadow-sm hover-shadow" style="transition: all 0.3s;">
                                 <div>
                                     <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                                    <h5>Laporan & Analisis</h5>
+                                    <h5 class="text-success">Laporan & Analisis</h5>
                                     <p class="text-muted">Lihat laporan pendapatan & statistik</p>
                                 </div>
                             </a>
@@ -88,29 +88,29 @@
 
                     <div class="row mt-3">
                         <div class="col-md-4 mb-3">
-                            <div class="card text-decoration-none text-muted border-2 border-secondary p-4 text-center shadow-sm" style="background-color: #f5f5f5; opacity: 0.6; cursor: not-allowed;">
+                            <a href="{% url 'admin_tagihan_list' %}" class="card text-decoration-none text-dark border-2 border-danger p-4 text-center shadow-sm hover-shadow" style="background-color: #fff5f5; transition: all 0.3s;">
                                 <div>
-                                    <i class="fas fa-receipt fa-3x mb-3" style="color: #ccc;"></i>
-                                    <h5>Kelola Tagihan</h5>
-                                    <p class="text-muted"><small><i class="fas fa-lock"></i> Dalam Pengembangan</small></p>
+                                    <i class="fas fa-receipt fa-3x mb-3" style="color: #dc3545;"></i>
+                                    <h5 class="text-danger">Kelola Tagihan</h5>
+                                    <p class="text-muted"><small>Lihat, edit, hapus tagihan</small></p>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <div class="card text-decoration-none text-muted border-2 border-secondary p-4 text-center shadow-sm" style="background-color: #f5f5f5; opacity: 0.6; cursor: not-allowed;">
+                            <a href="{% url 'admin_pengguna_list' %}" class="card text-decoration-none text-dark border-2 border-info p-4 text-center shadow-sm hover-shadow" style="background-color: #f5f5f5; transition: all 0.3s;">
                                 <div>
-                                    <i class="fas fa-users fa-3x mb-3" style="color: #ccc;"></i>
-                                    <h5>Kelola Pengguna</h5>
-                                    <p class="text-muted"><small><i class="fas fa-lock"></i> Dalam Pengembangan</small></p>
+                                    <i class="fas fa-users fa-3x mb-3" style="color: #0dcaf0;"></i>
+                                    <h5 class="text-info">Kelola Pengguna</h5>
+                                    <p class="text-muted"><small>Tambah, edit, hapus akun</small></p>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <div class="card text-decoration-none text-muted border-2 border-secondary p-4 text-center shadow-sm" style="background-color: #f5f5f5; opacity: 0.6; cursor: not-allowed;">
+                            <div class="card text-decoration-none text-muted border-2 border-secondary p-4 text-center shadow-sm" style="background-color: #f5f5f5;">
                                 <div>
-                                    <i class="fas fa-cog fa-3x mb-3" style="color: #ccc;"></i>
+                                    <i class="fas fa-cog fa-3x mb-3" style="color: #6c757d;"></i>
                                     <h5>Django Admin</h5>
-                                    <p class="text-muted"><small><i class="fas fa-lock"></i> Dalam Pengembangan</small></p>
+                                    <p class="text-muted"><small>Aktifkan admin Django jika diperlukan</small></p>
                                 </div>
                             </div>
                         </div>

@@ -15,19 +15,19 @@
         <div class="col-md-12">
             <div class="card shadow">
                 <div class="card-header bg-light">
-                    <h5>{{ object.title }}</h5>
+                    <h5>{{ report.title }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p><strong>Tipe Laporan:</strong></p>
-                            <p><span class="badge bg-info">{{ object.get_report_type_display }}</span></p>
+                            <p><span class="badge bg-info">{{ report.get_report_type_display }}</span></p>
                         </div>
                         <div class="col-md-6">
                             <p><strong>Status:</strong></p>
                             <p>
-                                <span class="badge bg-{% if object.status == 'Aktif' %}success{% else %}secondary{% endif %}">
-                                    {{ object.get_status_display }}
+                                <span class="badge bg-{% if report.status == 'published' %}success{% elif report.status == 'draft' %}warning{% else %}secondary{% endif %}">
+                                    {{ report.get_status_display }}
                                 </span>
                             </p>
                         </div>
@@ -36,18 +36,29 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <p><strong>Tanggal Dibuat:</strong></p>
-                            <p>{{ object.created_at|date:"d/m/Y H:i" }}</p>
+                            <p>{{ report.created_date|date:"d/m/Y H:i" }}</p>
                         </div>
                         <div class="col-md-6">
                             <p><strong>Tanggal Diperbarui:</strong></p>
-                            <p>{{ object.updated_at|date:"d/m/Y H:i" }}</p>
+                            <p>{{ report.modified_date|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Periode Mulai:</strong></p>
+                            <p>{{ report.start_date|default:"-" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Periode Selesai:</strong></p>
+                            <p>{{ report.end_date|default:"-" }}</p>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">
                             <p><strong>Deskripsi:</strong></p>
-                            <p>{{ object.description|default:"Tidak ada deskripsi" }}</p>
+                            <p>{{ report.description|default:"Tidak ada deskripsi" }}</p>
                         </div>
                     </div>
                 </div>
@@ -58,7 +69,8 @@
     <div class="row mt-4">
         <div class="col-md-12">
             <a href="{% url 'reporting_system:report_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali ke Daftar Laporan</a>
-            <a href="{% url 'reporting_system:report_delete' object.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus Laporan</a>
+            <a href="{% url 'reporting_system:report_update' report.pk %}" class="btn btn-warning text-white"><i class="fas fa-pen"></i> Edit</a>
+            <a href="{% url 'reporting_system:report_delete' report.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus Laporan</a>
         </div>
     </div>
 </div>

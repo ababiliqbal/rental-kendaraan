@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Laporan Pemesanan{% endblock %}
 
@@ -138,7 +139,7 @@
                                         {{ reservasi.get_status_display }}
                                     </span>
                                 </td>
-                                <td>Rp{{ reservasi.total_biaya|floatformat:0 }}</td>
+                                <td>Rp {{ reservasi.total_biaya|floatformat:0|intcomma }}</td>
                             </tr>
                             {% empty %}
                             <tr>

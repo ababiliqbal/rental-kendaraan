@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Kelola Reservasi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0"><i class="fas fa-calendar-alt"></i> Kelola Reservasi</h1>
+            <p class="text-muted mb-0">Buat, ubah, atau hapus data pemesanan.</p>
+        </div>
+        <a href="{% url 'admin_reservasi_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Reservasi</a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Pelanggan</th>
+                        <th>Kendaraan</th>
+                        <th>Mulai</th>
+                        <th>Selesai</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in reservasi_list %}
+                    <tr>
+                        <td>#{{ r.id }}</td>
+                        <td>{{ r.pelanggan.username }}</td>
+                        <td>{{ r.kendaraan.plat_nomor }}</td>
+                        <td>{{ r.tgl_mulai }}</td>
+                        <td>{{ r.tgl_selesai }}</td>
+                        <td>
+                            <span class="badge bg-{% if r.status == 'Selesai' %}success{% elif r.status == 'Aktif' %}info{% elif r.status == 'Batal' %}danger{% else %}warning{% endif %}">
+                                {{ r.status }}
+                            </span>
+                        </td>
+                        <td>Rp {{ r.total_biaya|floatformat:0|intcomma }}</td>
+                        <td class="d-flex gap-2">
+                            <a href="{% url 'admin_reservasi_update' r.pk %}" class="btn btn-sm btn-warning text-white"><i class="fas fa-pen"></i></a>
+                            <a href="{% url 'admin_reservasi_delete' r.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">Belum ada data reservasi.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,13 +1,23 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 # Import Model
 from kendaraan_ext.models import Kendaraan
-from .models import Reservasi, Tagihan, Pembayaran
-from .forms import RegistrasiPelangganForm, ReservasiForm, PembayaranForm
+from .models import Reservasi, Tagihan, Pembayaran, ProfilPengguna
+from .forms import (
+    RegistrasiPelangganForm,
+    ReservasiForm,
+    PembayaranForm,
+    KendaraanAdminForm,
+    ReservasiAdminForm,
+    TagihanAdminForm,
+    UserAdminCreateForm,
+    UserAdminUpdateForm,
+)
 
 # ==========================================
 # 1. HALAMAN UTAMA (HOME)
@@ -151,3 +161,242 @@ def admin_dashboard(request):
     }
     
     return render(request, 'manajemen_pengguna/admin_dashboard.html', context)
+
+
+# ==========================================
+# 5. CRUD KENDARAAN (Admin)
+# ==========================================
+@login_required(login_url='login')
+def admin_kendaraan_list(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    kendaraan_list = Kendaraan.objects.all().order_by('-id')
+    return render(request, 'manajemen_pengguna/admin_kendaraan_list.html', {'kendaraan_list': kendaraan_list})
+
+
+@login_required(login_url='login')
+def admin_kendaraan_create(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    if request.method == 'POST':
+        form = KendaraanAdminForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Kendaraan berhasil ditambahkan.")
+            return redirect('admin_kendaraan_list')
+    else:
+        form = KendaraanAdminForm()
+    return render(request, 'manajemen_pengguna/admin_kendaraan_form.html', {'form': form, 'mode': 'create'})
+
+
+@login_required(login_url='login')
+def admin_kendaraan_update(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    kendaraan = get_object_or_404(Kendaraan, pk=pk)
+    if request.method == 'POST':
+        form = KendaraanAdminForm(request.POST, request.FILES, instance=kendaraan)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Kendaraan berhasil diperbarui.")
+            return redirect('admin_kendaraan_list')
+    else:
+        form = KendaraanAdminForm(instance=kendaraan)
+    return render(request, 'manajemen_pengguna/admin_kendaraan_form.html', {'form': form, 'mode': 'update', 'kendaraan': kendaraan})
+
+
+@login_required(login_url='login')
+def admin_kendaraan_delete(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    kendaraan = get_object_or_404(Kendaraan, pk=pk)
+    if request.method == 'POST':
+        kendaraan.delete()
+        messages.success(request, "Kendaraan berhasil dihapus.")
+        return redirect('admin_kendaraan_list')
+    return render(request, 'manajemen_pengguna/admin_kendaraan_confirm_delete.html', {'kendaraan': kendaraan})
+
+
+# ==========================================
+# 6. CRUD RESERVASI (Admin)
+# ==========================================
+@login_required(login_url='login')
+def admin_reservasi_list(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    reservasi_list = Reservasi.objects.select_related('pelanggan', 'kendaraan').order_by('-id')
+    return render(request, 'manajemen_pengguna/admin_reservasi_list.html', {'reservasi_list': reservasi_list})
+
+
+@login_required(login_url='login')
+def admin_reservasi_create(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    if request.method == 'POST':
+        form = ReservasiAdminForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reservasi berhasil dibuat.")
+            return redirect('admin_reservasi_list')
+    else:
+        form = ReservasiAdminForm()
+    return render(request, 'manajemen_pengguna/admin_reservasi_form.html', {'form': form, 'mode': 'create'})
+
+
+@login_required(login_url='login')
+def admin_reservasi_update(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    reservasi = get_object_or_404(Reservasi, pk=pk)
+    if request.method == 'POST':
+        form = ReservasiAdminForm(request.POST, instance=reservasi)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Reservasi berhasil diperbarui.")
+            return redirect('admin_reservasi_list')
+    else:
+        form = ReservasiAdminForm(instance=reservasi)
+    return render(request, 'manajemen_pengguna/admin_reservasi_form.html', {'form': form, 'mode': 'update', 'reservasi': reservasi})
+
+
+@login_required(login_url='login')
+def admin_reservasi_delete(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    reservasi = get_object_or_404(Reservasi, pk=pk)
+    if request.method == 'POST':
+        reservasi.delete()
+        messages.success(request, "Reservasi berhasil dihapus.")
+        return redirect('admin_reservasi_list')
+    return render(request, 'manajemen_pengguna/admin_reservasi_confirm_delete.html', {'reservasi': reservasi})
+
+
+# ==========================================
+# 7. CRUD TAGIHAN (Admin)
+# ==========================================
+@login_required(login_url='login')
+def admin_tagihan_list(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    tagihan_list = Tagihan.objects.select_related('reservasi', 'reservasi__pelanggan', 'reservasi__kendaraan').order_by('-id')
+    return render(request, 'manajemen_pengguna/admin_tagihan_list.html', {'tagihan_list': tagihan_list})
+
+
+@login_required(login_url='login')
+def admin_tagihan_create(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    if request.method == 'POST':
+        form = TagihanAdminForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tagihan berhasil dibuat.")
+            return redirect('admin_tagihan_list')
+    else:
+        form = TagihanAdminForm()
+    return render(request, 'manajemen_pengguna/admin_tagihan_form.html', {'form': form, 'mode': 'create'})
+
+
+@login_required(login_url='login')
+def admin_tagihan_update(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    tagihan = get_object_or_404(Tagihan, pk=pk)
+    if request.method == 'POST':
+        form = TagihanAdminForm(request.POST, instance=tagihan)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tagihan berhasil diperbarui.")
+            return redirect('admin_tagihan_list')
+    else:
+        form = TagihanAdminForm(instance=tagihan)
+    return render(request, 'manajemen_pengguna/admin_tagihan_form.html', {'form': form, 'mode': 'update', 'tagihan': tagihan})
+
+
+@login_required(login_url='login')
+def admin_tagihan_delete(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    tagihan = get_object_or_404(Tagihan, pk=pk)
+    if request.method == 'POST':
+        tagihan.delete()
+        messages.success(request, "Tagihan berhasil dihapus.")
+        return redirect('admin_tagihan_list')
+    return render(request, 'manajemen_pengguna/admin_tagihan_confirm_delete.html', {'tagihan': tagihan})
+
+
+# ==========================================
+# 8. CRUD PENGGUNA (Admin)
+# ==========================================
+@login_required(login_url='login')
+def admin_pengguna_list(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    pengguna_list = User.objects.filter(is_superuser=False).select_related('profil').order_by('username')
+    # Pastikan profil tersedia agar template aman
+    for user in pengguna_list:
+        ProfilPengguna.objects.get_or_create(user=user)
+    return render(request, 'manajemen_pengguna/admin_pengguna_list.html', {'pengguna_list': pengguna_list})
+
+
+@login_required(login_url='login')
+def admin_pengguna_create(request):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    if request.method == 'POST':
+        form = UserAdminCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pengguna berhasil dibuat.")
+            return redirect('admin_pengguna_list')
+    else:
+        form = UserAdminCreateForm()
+    return render(request, 'manajemen_pengguna/admin_pengguna_form.html', {'form': form, 'mode': 'create'})
+
+
+@login_required(login_url='login')
+def admin_pengguna_update(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    pengguna = get_object_or_404(User, pk=pk, is_superuser=False)
+    profil = getattr(pengguna, 'profil', None)
+    if request.method == 'POST':
+        form = UserAdminUpdateForm(request.POST, instance=pengguna, profil=profil)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pengguna berhasil diperbarui.")
+            return redirect('admin_pengguna_list')
+    else:
+        form = UserAdminUpdateForm(instance=pengguna, profil=profil)
+    return render(request, 'manajemen_pengguna/admin_pengguna_form.html', {'form': form, 'mode': 'update', 'pengguna': pengguna})
+
+
+@login_required(login_url='login')
+def admin_pengguna_delete(request, pk):
+    if not request.user.is_staff:
+        messages.error(request, "Anda tidak memiliki akses.")
+        return redirect('home')
+    pengguna = get_object_or_404(User, pk=pk, is_superuser=False)
+    if pengguna == request.user:
+        messages.error(request, "Anda tidak dapat menghapus akun sendiri.")
+        return redirect('admin_pengguna_list')
+    if request.method == 'POST':
+        pengguna.delete()
+        messages.success(request, "Pengguna berhasil dihapus.")
+        return redirect('admin_pengguna_list')
+    return render(request, 'manajemen_pengguna/admin_pengguna_confirm_delete.html', {'pengguna': pengguna})

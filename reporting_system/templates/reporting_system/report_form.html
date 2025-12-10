@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'update' %}Edit Laporan{% else %}Buat Laporan{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1>
+                <i class="fas fa-file-pen"></i>
+                {% if mode == 'update' %}Edit Laporan{% else %}Buat Laporan{% endif %}
+            </h1>
+            <p class="text-muted">Lengkapi informasi laporan untuk halaman admin.</p>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">{% if mode == 'update' %}Perbarui{% else %}Tambah{% endif %} Laporan</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.report_type.label_tag }}
+                            {{ form.report_type }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.title.label_tag }}
+                            {{ form.title }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.description.label_tag }}
+                            {{ form.description }}
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.start_date.label_tag }}
+                                {{ form.start_date }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.end_date.label_tag }}
+                                {{ form.end_date }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.status.label_tag }}
+                            {{ form.status }}
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan
+                            </button>
+                            <a href="{% if mode == 'update' %}{% url 'reporting_system:report_detail' report.pk %}{% else %}{% url 'reporting_system:report_list' %}{% endif %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Kembali
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="fas fa-info-circle"></i> Petunjuk</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Pilih tipe laporan sesuai kebutuhan (revenue, booking, kendaraan, user, maintenance).</li>
+                        <li>Status bisa diubah menjadi Draft, Published, atau Archived sesuai progres.</li>
+                        <li>Periode tanggal opsional jika laporan membutuhkan rentang waktu.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

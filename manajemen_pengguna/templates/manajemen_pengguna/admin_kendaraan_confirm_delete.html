@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Hapus Kendaraan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card border-danger shadow">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Konfirmasi Hapus</h5>
+        </div>
+        <div class="card-body">
+            <p>Anda yakin ingin menghapus kendaraan berikut?</p>
+            <div class="alert alert-warning">
+                <strong>{{ kendaraan.plat_nomor }}</strong><br>
+                {{ kendaraan.merk }} {{ kendaraan.model }} ({{ kendaraan.tahun }})
+            </div>
+            <form method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> Ya, Hapus</button>
+            </form>
+            <a href="{% url 'admin_kendaraan_list' %}" class="btn btn-secondary"><i class="fas fa-times"></i> Batal</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

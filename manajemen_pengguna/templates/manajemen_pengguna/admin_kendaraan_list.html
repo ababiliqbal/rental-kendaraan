@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Kelola Kendaraan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0"><i class="fas fa-car"></i> Kelola Kendaraan</h1>
+            <p class="text-muted mb-0">Tambah, edit, dan hapus kendaraan rental.</p>
+        </div>
+        <a href="{% url 'admin_kendaraan_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Kendaraan</a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Plat</th>
+                        <th>Merk / Model</th>
+                        <th>Tahun</th>
+                        <th>Status</th>
+                        <th>Harga/Hari</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for k in kendaraan_list %}
+                    <tr>
+                        <td>{{ k.plat_nomor }}</td>
+                        <td>{{ k.merk }} {{ k.model }}</td>
+                        <td>{{ k.tahun }}</td>
+                        <td>
+                            <span class="badge bg-{% if k.status == 'Tersedia' %}success{% elif k.status == 'Dirental' %}warning{% else %}secondary{% endif %}">
+                                {{ k.status }}
+                            </span>
+                        </td>
+                        <td>Rp {{ k.harga_sewa_per_hari|floatformat:0|intcomma }}</td>
+                        <td class="d-flex gap-2">
+                            <a href="{% url 'admin_kendaraan_update' k.pk %}" class="btn btn-sm btn-warning text-white"><i class="fas fa-pen"></i></a>
+                            <a href="{% url 'admin_kendaraan_delete' k.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Belum ada data kendaraan.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

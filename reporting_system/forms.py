@@ -7,15 +7,23 @@ class ReportFilterForm(forms.Form):
     REPORT_TYPE_CHOICES = [('', 'All Types')] + list(Report.REPORT_TYPE_CHOICES)
     STATUS_CHOICES = [('', 'All Status')] + list(Report.STATUS_CHOICES)
     
-    report_type = forms.ChoiceField(choices=REPORT_TYPE_CHOICES, required=False)
-    status = forms.ChoiceField(choices=STATUS_CHOICES, required=False)
+    report_type = forms.ChoiceField(
+        choices=REPORT_TYPE_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    status = forms.ChoiceField(
+        choices=STATUS_CHOICES,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
     start_date = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={'type': 'date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
     end_date = forms.DateField(
         required=False,
-        widget=forms.DateInput(attrs={'type': 'date'})
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
 
 

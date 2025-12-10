@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Kelola Tagihan{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="h3 mb-0"><i class="fas fa-receipt"></i> Kelola Tagihan</h1>
+            <p class="text-muted mb-0">Buat, ubah, atau hapus tagihan.</p>
+        </div>
+        <a href="{% url 'admin_tagihan_create' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Tambah Tagihan</a>
+    </div>
+
+    <div class="card shadow border-danger">
+        <div class="card-body table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Reservasi</th>
+                        <th>Pelanggan</th>
+                        <th>Kendaraan</th>
+                        <th>Total Akhir</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in tagihan_list %}
+                    <tr>
+                        <td>#{{ t.id }}</td>
+                        <td>#{{ t.reservasi.id }}</td>
+                        <td>{{ t.reservasi.pelanggan.username }}</td>
+                        <td>{{ t.reservasi.kendaraan.plat_nomor }}</td>
+                        <td>Rp {{ t.total_akhir|floatformat:0|intcomma }}</td>
+                        <td>
+                            <span class="badge bg-{% if t.status == 'Lunas' %}success{% elif t.status == 'Menunggu Verifikasi' %}warning{% else %}secondary{% endif %}">
+                                {{ t.status }}
+                            </span>
+                        </td>
+                        <td class="d-flex gap-2">
+                            <a href="{% url 'admin_tagihan_update' t.pk %}" class="btn btn-sm btn-warning text-white"><i class="fas fa-pen"></i></a>
+                            <a href="{% url 'admin_tagihan_delete' t.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Belum ada data tagihan.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+</div>
+{% endblock %}
+
