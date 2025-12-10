@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from manajemen_pengguna import views  
+from django.shortcuts import render
 from django.conf import settings
 from django.conf.urls.static import static 
 
@@ -20,4 +21,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += [
+        path('test-404/', lambda request: render(request, '404.html')),
+    ]
