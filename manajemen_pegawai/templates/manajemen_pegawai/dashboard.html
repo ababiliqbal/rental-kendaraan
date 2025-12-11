@@ -1,84 +1,270 @@
 {% extends "manajemen_pegawai/dashboard_base.html" %}
 
-{% block title %}Dashboard Utama{% endblock %}
-{% block nav_dash %}active{% endblock %} {% block content %}
-<div class="container-fluid p-0">
+{% block title %}Dashboard Operasional{% endblock %}
+{% block nav_dash %}active{% endblock %}
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+{% block content %}
+
+<div class="flex-fill p-4 bg-light" style="height: 100vh; overflow-y: auto;">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
         <div>
-            <h2 class="fw-bold text-dark">Dashboard Operasional</h2>
-            <p class="text-muted mb-0">Selamat datang kembali, {{ user.first_name }}!</p>
+            <h2 class="fw-bold text-dark mb-1">Dashboard Operasional</h2>
+            <p class="text-muted mb-0">Ringkasan aktivitas dan tugas hari ini.</p>
         </div>
-        <div class="text-end text-muted small">
-            <i class="far fa-calendar me-1"></i> {% now "l, d F Y" %}
+        <div class="mt-3 mt-md-0">
+            <span class="badge bg-white text-dark border shadow-sm px-3 py-2 rounded-pill">
+                <i class="fas fa-calendar-alt text-primary me-2"></i> {% now "l, d F Y" %}
+            </span>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 rounded-3"
+            role="alert">
+            <i class="fas fa-info-circle me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row g-3 mb-4">
         <div class="col-md-6 col-lg-3">
-            <div class="card bg-primary text-white border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+            <div class="card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="text-uppercase mb-1 small opacity-75">Sewa Aktif</h6>
-                            <h2 class="fw-bold mb-0">{{ total_sewa_aktif|default:"0" }}</h2>
+                            <p class="text-uppercase text-muted small fw-bold mb-1">Menunggu Verifikasi</p>
+                            <h2 class="fw-bold text-dark mb-0">{{ total_pending }}</h2>
                         </div>
-                        <div class="bg-white bg-opacity-25 p-3 rounded">
-                            <i class="fas fa-key fa-2x"></i>
+                        <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-clock fa-lg"></i>
                         </div>
                     </div>
                 </div>
+                <div class="position-absolute bottom-0 start-0 w-100 bg-warning" style="height: 4px;"></div>
             </div>
         </div>
 
         <div class="col-md-6 col-lg-3">
-            <div class="card bg-warning text-dark border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+            <div class="card border-0 shadow-sm rounded-4 h-100 position-relative overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="text-uppercase mb-1 small opacity-75 fw-bold">Perlu Konfirmasi</h6>
-                            <h2 class="fw-bold mb-0">{{ butuh_konfirmasi|default:"0" }}</h2>
+                            <p class="text-uppercase text-muted small fw-bold mb-1">Sewa Aktif</p>
+                            <h2 class="fw-bold text-primary mb-0">{{ total_aktif }}</h2>
                         </div>
-                        <div class="bg-white bg-opacity-25 p-3 rounded">
-                            <i class="fas fa-bell fa-2x"></i>
+                        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="fas fa-car-side fa-lg"></i>
                         </div>
                     </div>
                 </div>
+                <div class="position-absolute bottom-0 start-0 w-100 bg-primary" style="height: 4px;"></div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-success text-white border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1 small opacity-75">Unit Tersedia</h6>
-                            <h2 class="fw-bold mb-0">{{ unit_tersedia|default:"0" }}</h2>
-                        </div>
-                        <div class="bg-white bg-opacity-25 p-3 rounded">
-                            <i class="fas fa-car fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex align-items-center justify-content-between">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-file-invoice-dollar text-warning me-2"></i> Verifikasi Pembayaran
+            </h5>
+            {% if tagihan_pending %}
+            <span class="badge bg-danger rounded-pill">{{ tagihan_pending|length }} Pending</span>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 600px;">
+                    <thead class="bg-light text-secondary text-uppercase small">
+                        <tr>
+                            <th class="ps-4 py-3 fw-bold border-0">ID Tagihan</th>
+                            <th class="py-3 fw-bold border-0">Pelanggan</th>
+                            <th class="py-3 fw-bold border-0">Total</th>
+                            <th class="py-3 fw-bold border-0">Bukti Transfer</th>
+                            <th class="text-end pe-4 py-3 fw-bold border-0">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tagihan in tagihan_pending %}
+                        <tr>
+                            <td class="ps-4">
+                                <span class="badge bg-light text-dark border">#{{ tagihan.id }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-initial rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2"
+                                        style="width: 35px; height: 35px; font-size: 0.8rem;">
+                                        {{ tagihan.reservasi.pelanggan.first_name|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ tagihan.reservasi.pelanggan.first_name }}
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.8rem;">{{
+                                            tagihan.reservasi.pelanggan.username }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="fw-bold text-success">Rp {{ tagihan.total_akhir|floatformat:0 }}</td>
+                            <td>
+                                {% with bayar=tagihan.riwayat_pembayaran.last %}
+                                {% if bayar and bayar.bukti_transfer %}
+                                <a href="{{ bayar.bukti_transfer.url }}" target="_blank"
+                                    class="position-relative d-inline-block group-hover">
+                                    <img src="{{ bayar.bukti_transfer.url }}" class="rounded-3 shadow-sm border"
+                                        width="60" height="40" style="object-fit: cover; transition: transform 0.2s;">
+                                    <span
+                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark border border-light">
+                                        <i class="fas fa-search-plus" style="font-size: 10px;"></i>
+                                    </span>
+                                </a>
+                                {% else %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">No File</span>
+                                {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'verifikasi_pembayaran' tagihan.id 'terima' %}"
+                                        class="btn btn-sm btn-outline-success px-3 rounded-start-pill" title="Terima"
+                                        onclick="return confirm('Terima pembayaran ini?')">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{% url 'verifikasi_pembayaran' tagihan.id 'tolak' %}"
+                                        class="btn btn-sm btn-outline-danger px-3 rounded-end-pill" title="Tolak"
+                                        onclick="return confirm('Tolak pembayaran ini?')">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted opacity-50 mb-2">
+                                    <i class="fas fa-check-circle fa-3x"></i>
+                                </div>
+                                <p class="mb-0 text-muted small fw-bold">Semua pembayaran aman terkendali.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-info text-white border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-uppercase mb-1 small opacity-75">Pegawai Aktif</h6>
-                            <h2 class="fw-bold mb-0">{{ user.pegawai_profile.get_total_pegawai|default:"-" }}</h2>
-                        </div>
-                        <div class="bg-white bg-opacity-25 p-3 rounded">
-                            <i class="fas fa-users fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 border-bottom">
+            <h5 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-key text-primary me-2"></i> Status Sewa & Pengembalian
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
+                    <thead class="bg-light text-secondary text-uppercase small">
+                        <tr>
+                            <th class="ps-4 py-3 fw-bold border-0">Unit Kendaraan</th>
+                            <th class="py-3 fw-bold border-0">Penyewa</th>
+                            <th class="py-3 fw-bold border-0">Jadwal Sewa</th>
+                            <th class="py-3 fw-bold border-0">Status Bayar</th>
+                            <th class="py-3 fw-bold border-0">Status Unit</th>
+                            <th class="text-end pe-4 py-3 fw-bold border-0">Aksi Operasional</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in reservasi_aktif %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-white border rounded-3 p-2 me-3 shadow-sm text-center"
+                                        style="width: 45px; height: 45px; display: grid; place-items: center;">
+                                        <i class="fas fa-car text-primary fa-lg"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ res.kendaraan.merk }}</div>
+                                        <span class="badge bg-light text-secondary border px-2 py-1"
+                                            style="font-size: 0.7rem;">{{ res.kendaraan.plat_nomor }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-medium">{{ res.pelanggan.first_name }}</span>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <small class="text-muted mb-1" style="font-size: 0.75rem;">Mulai - Selesai</small>
+                                    <span class="badge bg-light text-dark border fw-normal py-2">
+                                        {{ res.tgl_mulai|date:"d M" }} <i class="fas fa-arrow-right mx-1 text-muted"
+                                            style="font-size: 10px;"></i> {{ res.tgl_selesai|date:"d M" }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                {% if res.tagihan.status == 'Lunas' %}
+                                <span
+                                    class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 border border-success-subtle">
+                                    <i class="fas fa-check-circle me-1"></i> Lunas
+                                </span>
+                                {% else %}
+                                <span
+                                    class="badge rounded-pill bg-warning bg-opacity-10 text-warning px-3 py-2 border border-warning-subtle">
+                                    <i class="fas fa-clock me-1"></i> Pending
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if res.status == 'Dipesan' %}
+                                <span
+                                    class="badge rounded-pill bg-info bg-opacity-10 text-info px-3 py-2 border border-info-subtle">
+                                    <i class="fas fa-calendar-check me-1"></i> Booking
+                                </span>
+                                {% elif res.status == 'Aktif' %}
+                                <span
+                                    class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2 border border-primary-subtle">
+                                    <i class="fas fa-road me-1"></i> Jalan
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                {% if res.status == 'Dipesan' and res.tagihan.status == 'Lunas' %}
+                                <a href="{% url 'update_status_pesanan' res.id 'aktif' %}"
+                                    class="btn btn-primary btn-sm px-3 rounded-3 shadow-sm w-100">
+                                    <i class="fas fa-key me-2"></i>Serah Kunci
+                                </a>
+                                {% elif res.status == 'Aktif' %}
+                                <a href="{% url 'proses_pengembalian' res.id %}"
+                                    class="btn btn-warning btn-sm px-3 rounded-3 shadow-sm w-100 text-dark fw-medium">
+                                    <i class="fas fa-clipboard-check me-2"></i>Terima Unit
+                                </a>
+                                {% else %}
+                                <button class="btn btn-light btn-sm w-100 text-muted border" disabled>
+                                    <i class="fas fa-hourglass-half me-1"></i> Menunggu
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty"
+                                    width="60" class="mb-3 opacity-25" style="filter: grayscale(100%);">
+                                <p class="mb-0 text-muted small">Belum ada penyewaan yang aktif saat ini.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
 </div>
+
 {% endblock %}

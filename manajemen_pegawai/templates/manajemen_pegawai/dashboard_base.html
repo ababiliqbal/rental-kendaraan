@@ -7,64 +7,167 @@
     <title>{% block title %}Admin Panel | RentalPro{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-bg: #212529;
+            --sidebar-hover: rgba(255, 255, 255, 0.1);
+            --primary-color: #0d6efd;
+        }
+
         body {
-            background-color: #f8f9fa;
-        }
-
-        .sidebar {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
-            background: #212529;
-            color: white;
-            width: 250px;
+        }
+
+        /* --- SIDEBAR STYLING --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: #fff;
             position: fixed;
-            z-index: 1000;
-            transition: all 0.3s;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            /* Full height viewport */
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
-            transition: all 0.3s;
+        /* Header Sidebar - Fixed at top */
+        .sidebar-header {
+            padding: 1.5rem 1.25rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+            /* Mencegah header mengecil */
         }
 
+        /* Navigation Container - Scrollable Area */
+        .sidebar-nav-scroll {
+            flex-grow: 1;
+            /* Mengisi ruang kosong */
+            overflow-y: auto;
+            /* Scroll jika konten panjang */
+            overflow-x: hidden;
+            padding-bottom: 1rem;
+        }
+
+        /* Custom Scrollbar untuk Sidebar (Chrome/Safari) */
+        .sidebar-nav-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar-nav-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-nav-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        /* Footer Sidebar - Fixed at bottom */
+        .sidebar-footer {
+            padding: 1.25rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+            /* Mencegah footer mengecil */
+        }
+
+        /* Menu Links */
         .nav-link {
             color: rgba(255, 255, 255, 0.75);
-            padding: 10px 20px;
+            padding: 0.8rem 1.5rem;
             font-weight: 500;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
         }
 
-        .nav-link:hover,
+        .nav-link:hover {
+            color: #fff;
+            background-color: var(--sidebar-hover);
+        }
+
         .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid #0d6efd;
+            color: #fff;
+            background: linear-gradient(90deg, rgba(13, 110, 253, 0.15) 0%, transparent 100%);
+            border-left-color: var(--primary-color);
         }
 
         .nav-link i {
-            width: 25px;
+            width: 24px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.8;
+        }
+
+        .nav-link.active i {
+            color: var(--primary-color);
+            opacity: 1;
         }
 
         .section-title {
             font-size: 0.75rem;
             text-transform: uppercase;
-            color: #6c757d;
-            font-weight: bold;
-            padding: 15px 20px 5px;
-            letter-spacing: 1px;
+            color: #adb5bd;
+            font-weight: 700;
+            padding: 1.5rem 1.5rem 0.5rem;
+            letter-spacing: 0.5px;
         }
 
-        @media (max-width: 768px) {
+        /* --- MAIN CONTENT STYLING --- */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: margin-left 0.3s ease-in-out;
+            min-height: 100vh;
+        }
+
+        /* --- RESPONSIVE / MOBILE --- */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        @media (max-width: 991.98px) {
             .sidebar {
-                margin-left: -250px;
+                transform: translateX(-100%);
+                /* Sembunyikan sidebar ke kiri */
             }
 
-            .sidebar.active {
-                margin-left: 0;
+            .sidebar.show {
+                transform: translateX(0);
+                /* Munculkan sidebar */
             }
 
             .main-content {
                 margin-left: 0;
+                padding: 1rem;
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+                opacity: 1;
             }
         }
     </style>
@@ -72,96 +175,156 @@
 
 <body>
 
-    <div class="sidebar" id="sidebar">
-        <div class="py-4 px-3 mb-2 border-bottom border-secondary">
-            <h4 class="fw-bold m-0"><i class="fas fa-car-side text-primary me-2"></i>RentalPro</h4>
-            <small class="text-muted">Admin Dashboard</small>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center text-decoration-none">
+                <div class="bg-primary text-white rounded p-1 me-2 d-flex align-items-center justify-content-center"
+                    style="width: 32px; height: 32px;">
+                    <i class="fas fa-car-side fa-sm"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold m-0 text-white" style="line-height: 1;">RentalPro</h5>
+                    <small class="text-white-50" style="font-size: 11px;">Management System</small>
+                </div>
+            </div>
         </div>
 
-        <ul class="nav flex-column">
-            <li class="section-title">Operasional</li>
-            <li class="nav-item">
-                <a href="{% url 'dashboard_pegawai' %}" class="nav-link {% block nav_dash %}{% endblock %}">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'daftar_armada' %}" class="nav-link">
-                    <i class="fas fa-car"></i> Kelola Armada
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'daftar_mitra' %}" class="nav-link">
-                    <i class="fas fa-handshake"></i> Data Mitra
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'dashboard_reporting' %}" class="nav-link">
-                    <i class="fas fa-chart-line"></i> Laporan
-                </a>
-            </li>
+        <div class="sidebar-nav-scroll">
+            <ul class="nav flex-column">
+                <li class="section-title">Operasional</li>
+                <li class="nav-item">
+                    <a href="{% url 'dashboard_pegawai' %}" class="nav-link {% block nav_dash %}{% endblock %}">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'daftar_armada' %}" class="nav-link">
+                        <i class="fas fa-car"></i> Kelola Armada
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'daftar_mitra' %}" class="nav-link">
+                        <i class="fas fa-handshake"></i> Data Mitra
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'dashboard_reporting' %}" class="nav-link">
+                        <i class="fas fa-chart-pie"></i> Laporan
+                    </a>
+                </li>
 
-            <li class="section-title mt-2">HRD & Pegawai</li>
-            <li class="nav-item">
-                <a href="{% url 'pegawai_list' %}" class="nav-link {% block nav_pegawai %}{% endblock %}">
-                    <i class="fas fa-users"></i> Data Pegawai
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'jadwal_list' %}" class="nav-link {% block nav_jadwal %}{% endblock %}">
-                    <i class="fas fa-calendar-alt"></i> Jadwal Kerja
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'shift_list' %}" class="nav-link {% block nav_shift %}{% endblock %}">
-                    <i class="fas fa-clock"></i> Data Shift
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'gaji_list' %}" class="nav-link {% block nav_gaji %}{% endblock %}">
-                    <i class="fas fa-file-invoice-dollar"></i> Slip Gaji
-                </a>
-            </li>
+                <li class="section-title">Manajemen SDM</li>
+                <li class="nav-item">
+                    <a href="{% url 'pegawai_list' %}" class="nav-link {% block nav_pegawai %}{% endblock %}">
+                        <i class="fas fa-users"></i> Data Pegawai
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'jadwal_list' %}" class="nav-link {% block nav_jadwal %}{% endblock %}">
+                        <i class="fas fa-calendar-check"></i> Jadwal Kerja
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'shift_list' %}" class="nav-link {% block nav_shift %}{% endblock %}">
+                        <i class="fas fa-business-time"></i> Data Shift
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'gaji_list' %}" class="nav-link {% block nav_gaji %}{% endblock %}">
+                        <i class="fas fa-file-invoice-dollar"></i> Slip Gaji
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-            <li class="section-title mt-2">Akun</li>
-            <li class="nav-item">
-                <a href="{% url 'home' %}" class="nav-link"><i class="fas fa-globe"></i> Lihat Website</a>
-            </li>
-            <li class="nav-item">
-                <a href="{% url 'logout' %}" class="nav-link text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            </li>
-        </ul>
-    </div>
+        <div class="sidebar-footer">
+            <a href="{% url 'home' %}"
+                class="btn btn-outline-light w-100 mb-2 btn-sm border-secondary text-white-50 hover-white">
+                <i class="fas fa-globe me-2"></i> Lihat Website
+            </a>
+            <a href="{% url 'logout' %}" class="btn btn-danger w-100 btn-sm">
+                <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </a>
+        </div>
+    </nav>
 
     <div class="main-content">
-        <nav class="navbar navbar-light bg-white shadow-sm mb-4 rounded d-md-none">
+        <nav class="navbar navbar-light bg-white shadow-sm mb-4 rounded d-lg-none border">
             <div class="container-fluid">
-                <button class="btn btn-outline-primary" id="sidebarToggle"><i class="fas fa-bars"></i></button>
-                <span class="fw-bold">Admin Panel</span>
+                <button class="btn btn-outline-secondary border-0" id="sidebarToggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+                <span class="fw-bold text-dark">Admin Panel</span>
+                <div style="width: 40px;"></div>
             </div>
         </nav>
 
         {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0" role="alert">
+                <i class="fas fa-info-circle me-2"></i> {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
         {% endif %}
 
         {% block content %}
         {% endblock %}
 
-        <footer class="mt-5 text-muted small text-center">
-            &copy; 2025 RentalPro Management System
+        <footer class="mt-5 py-4 text-center text-muted small">
+            <p class="mb-0">&copy; 2025 RentalPro Management System. All rights reserved.</p>
         </footer>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('sidebarToggle').addEventListener('click', function () {
-            document.getElementById('sidebar').classList.toggle('active');
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const body = document.body;
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+
+                // Mencegah scroll pada body saat menu terbuka di mobile
+                if (sidebar.classList.contains('show') && window.innerWidth < 992) {
+                    body.style.overflow = 'hidden';
+                } else {
+                    body.style.overflow = '';
+                }
+            }
+
+            // Klik tombol hamburger
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+
+            // Klik area gelap (overlay) untuk menutup
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function () {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                    body.style.overflow = '';
+                });
+            }
+
+            // Tutup sidebar jika layar di-resize ke desktop (untuk mereset state)
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 992) {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                    body.style.overflow = '';
+                }
+            });
         });
     </script>
 </body>
