@@ -1,0 +1,94 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+
+{% block title %}Detail Pegawai{% endblock %}
+{% block nav_pegawai %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <div class="card-header bg-white p-4 border-bottom">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary me-4">
+                            <i class="fas fa-user-circle fa-4x"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h2 class="fw-bold text-dark mb-1">{{ object.user.get_full_name }}</h2>
+                            <p class="text-muted mb-2">{{ object.jabatan }} &bull; {{ object.no_induk_pegawai }}</p>
+
+                            {% if object.status == 'Aktif' %}
+                            <span class="badge bg-success">Status: Aktif</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Status: {{ object.status }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <a href="{% url 'pegawai_update' object.pk %}" class="btn btn-warning shadow-sm">
+                                <i class="fas fa-edit me-2"></i> Edit Data
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-6 p-4 border-end">
+                            <h6 class="text-uppercase text-muted fw-bold small mb-4">Informasi Pribadi</h6>
+
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Email</label>
+                                <span class="fw-medium">{{ object.user.email }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Nomor Telepon</label>
+                                <span class="fw-medium">{{ object.no_telepon }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Nomor KTP</label>
+                                <span class="fw-medium">{{ object.no_ktp }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Alamat</label>
+                                <span class="fw-medium">{{ object.alamat }}</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 p-4 bg-light bg-opacity-50">
+                            <h6 class="text-uppercase text-muted fw-bold small mb-4">Data Kepegawaian</h6>
+
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Departemen</label>
+                                <span class="fw-medium">{{ object.departemen }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Tanggal Bergabung</label>
+                                <span class="fw-medium">{{ object.tanggal_bergabung|date:"d F Y" }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Gaji Pokok</label>
+                                <span class="fw-bold text-success fs-5">Rp {{ object.gaji_pokok|floatformat:0 }}</span>
+                            </div>
+                            <div class="mb-3">
+                                <label class="small text-muted fw-bold d-block">Terdaftar Sejak</label>
+                                <span class="fw-medium text-muted small">{{ object.created_at|date:"d M Y H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light py-3 d-flex justify-content-between align-items-center">
+                    <a href="{% url 'pegawai_list' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i> Kembali ke Daftar
+                    </a>
+                    <a href="{% url 'pegawai_delete' object.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i> Hapus Pegawai
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

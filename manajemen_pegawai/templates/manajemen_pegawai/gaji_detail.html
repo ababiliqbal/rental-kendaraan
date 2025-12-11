@@ -1,0 +1,53 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+{% block title %}Detail Slip Gaji{% endblock %}
+{% block nav_gaji %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white py-4 text-center">
+                    <h5 class="mb-0 fw-bold">SLIP GAJI PEGAWAI</h5>
+                    <small class="opacity-75">Periode: {{ object.bulan|date:"F Y" }}</small>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold">{{ object.pegawai.user.get_full_name }}</h3>
+                        <p class="text-muted">{{ object.pegawai.jabatan }} - {{ object.pegawai.no_induk_pegawai }}</p>
+
+                        {% if object.status == 'Sudah Dibayar' %}
+                        <span class="badge bg-success px-3 py-2 rounded-pill">LUNAS</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">PENDING</span>
+                        {% endif %}
+                    </div>
+
+                    <ul class="list-group list-group-flush mb-4">
+                        <li class="list-group-item d-flex justify-content-between py-3">
+                            <span>Gaji Pokok</span>
+                            <span class="fw-bold">Rp {{ object.gaji_pokok|floatformat:0 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between py-3">
+                            <span>Tunjangan</span>
+                            <span class="fw-bold text-success">+ Rp {{ object.tunjangan|floatformat:0 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between py-3">
+                            <span>Potongan</span>
+                            <span class="fw-bold text-danger">- Rp {{ object.potongan|floatformat:0 }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between py-3 bg-light fw-bold fs-5">
+                            <span>TOTAL DITERIMA</span>
+                            <span class="text-primary">Rp {{ object.total_gaji|floatformat:0 }}</span>
+                        </li>
+                    </ul>
+
+                    <div class="d-grid">
+                        <a href="{% url 'gaji_list' %}" class="btn btn-outline-secondary">Kembali</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

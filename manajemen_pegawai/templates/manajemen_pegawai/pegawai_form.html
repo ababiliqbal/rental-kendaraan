@@ -1,0 +1,119 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+
+{% block title %}
+{% if object %}Edit Pegawai{% else %}Tambah Pegawai{% endif %}
+{% endblock %}
+
+{% block nav_pegawai %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">
+                {% if object %}Edit Data Pegawai{% else %}Tambah Pegawai Baru{% endif %}
+            </h3>
+            <p class="text-muted mb-0">Isi formulir berikut dengan data yang valid.</p>
+        </div>
+        <a href="{% url 'pegawai_list' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Kembali
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="bg-light p-3 rounded mb-4 border">
+                            <h6 class="text-primary fw-bold text-uppercase small ls-1 mb-3">
+                                <i class="fas fa-user-lock me-2"></i> Informasi Akun (Login)
+                            </h6>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Nama Depan</label>
+                                    {{ form.first_name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold small">Nama Belakang</label>
+                                    {{ form.last_name }}
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold small">Email (Username)</label>
+                                    {{ form.email }}
+                                    <div class="form-text small text-muted">
+                                        Email ini akan digunakan sebagai username login.
+                                        <br>Password default sistem: <strong>pegawai123</strong> (Bisa diganti nanti).
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6 class="text-secondary fw-bold text-uppercase small ls-1 mb-3 mt-4">
+                            <i class="fas fa-id-card me-2"></i> Data Kepegawaian
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">NIP (No. Induk Pegawai)</label>
+                                {{ form.no_induk_pegawai }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Nomor KTP</label>
+                                {{ form.no_ktp }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Jabatan</label>
+                                {{ form.jabatan }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Departemen</label>
+                                {{ form.departemen }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Status Keaktifan</label>
+                                {{ form.status }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Gaji Pokok</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    {{ form.gaji_pokok }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Tanggal Masuk</label>
+                                {{ form.tanggal_bergabung }}
+                            </div>
+                        </div>
+
+                        <h6 class="text-secondary fw-bold text-uppercase small ls-1 mb-3 mt-4">
+                            <i class="fas fa-address-book me-2"></i> Kontak & Alamat
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">No. HP / WhatsApp</label>
+                                {{ form.no_telepon }}
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold small">Alamat Lengkap</label>
+                                {{ form.alamat }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'pegawai_list' %}" class="btn btn-light border px-4">Batal</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm">
+                                <i class="fas fa-save me-2"></i> Simpan Data
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

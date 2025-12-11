@@ -1,0 +1,65 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+{% block title %}Form Gaji{% endblock %}
+{% block nav_gaji %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">{% if object %}Edit Slip Gaji{% else %}Buat Slip Gaji Baru{% endif %}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Pegawai</label>
+                                {{ form.pegawai }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Bulan Periode</label>
+                                {{ form.bulan }}
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted small fw-bold mt-4 mb-3 text-uppercase">Rincian Keuangan</h6>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-primary">Gaji Pokok (+)</label>
+                                {{ form.gaji_pokok }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-success">Tunjangan (+)</label>
+                                {{ form.tunjangan }}
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-danger">Potongan (-)</label>
+                                {{ form.potongan }}
+                            </div>
+                        </div>
+
+                        <h6 class="text-muted small fw-bold mt-4 mb-3 text-uppercase">Status Pembayaran</h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Status</label>
+                                {{ form.status }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Tanggal Bayar</label>
+                                {{ form.tanggal_pembayaran }}
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'gaji_list' %}" class="btn btn-light border">Batal</a>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold">Simpan Data</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

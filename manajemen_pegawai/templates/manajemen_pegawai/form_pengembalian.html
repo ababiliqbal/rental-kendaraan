@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <title>Form Pengembalian | AdminPro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-light">
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow border-0">
+                    <div class="card-header bg-dark text-white py-3">
+                        <h5 class="mb-0"><i class="fas fa-undo me-2"></i> Proses Pengembalian Kendaraan</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        <div class="alert alert-info d-flex align-items-center">
+                            <i class="fas fa-car fa-2x me-3"></i>
+                            <div>
+                                <h5 class="mb-0 fw-bold">{{ reservasi.kendaraan.merk }} {{ reservasi.kendaraan.model }}
+                                </h5>
+                                <small>
+                                    {{ reservasi.kendaraan.plat_nomor }} | Penyewa:
+                                    {{ reservasi.pelanggan.first_name }}</small>
+                            </div>
+                        </div>
+
+                        {% if telat_hari > 0 %}
+                        <div class="card bg-danger text-white mb-4">
+                            <div class="card-body">
+                                <h5 class="fw-bold"><i class="fas fa-exclamation-triangle me-2"></i> TERLAMBAT {{
+                                    telat_hari }} HARI</h5>
+                                <p class="mb-0">
+                                    Jadwal Kembali: {{ reservasi.tgl_selesai|date:"d M Y" }} <br>
+                                    Hari Ini: {% now "d M Y" %}
+                                </p>
+                                <hr>
+                                <h4 class="mb-0 fw-bold text-end">Denda: Rp {{ denda_telat|floatformat:0 }}</h4>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i> Pengembalian Tepat Waktu. Tidak ada denda
+                            keterlambatan.
+                        </div>
+                        {% endif %}
+
+                        <hr>
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <h6 class="fw-bold mb-3">Pemeriksaan Fisik</h6>
+
+                            <div class="mb-3">
+                                <label class="form-label">Denda Kerusakan (Opsional)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    {{ form.denda_kerusakan }}
+                                </div>
+                                <div class="form-text">Isi 0 jika kondisi mobil mulus.</div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Keterangan Kerusakan</label>
+                                {{ form.keterangan_kerusakan }}
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary w-100 btn-lg shadow">
+                                    <i class="fas fa-save me-2"></i> Konfirmasi Pengembalian
+                                </button>
+                                <a href="{% url 'dashboard_pegawai' %}"
+                                    class="btn btn-outline-secondary btn-lg">Batal</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
