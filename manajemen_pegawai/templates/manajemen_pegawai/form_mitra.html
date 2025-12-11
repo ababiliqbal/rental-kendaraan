@@ -1,58 +1,170 @@
-<!DOCTYPE html>
-<html lang="id">
+{% extends "manajemen_pegawai/dashboard_base.html" %}
 
-<head>
-    <title>{{ title }} | AdminPro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+{% block title %}{{ title }} | AdminPro{% endblock %}
+{% block nav_mitra %}active{% endblock %}
+{% block content %}
 
-<body class="bg-light">
+<div class="container-fluid px-0 pb-5">
 
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card shadow border-0">
-                    <div class="card-header bg-primary text-white py-3">
-                        <h5 class="mb-0 fw-bold"><i class="fas {{ icon }} me-2"></i> {{ title }}</h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form method="POST">
-                            {% csrf_token %}
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Nama Lengkap Mitra</label>
-                                {{ form.nama }}
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Nomor WhatsApp/HP</label>
-                                {{ form.no_hp }}
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Alamat Domisili</label>
-                                {{ form.alamat }}
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="form-label fw-bold">Keterangan / Catatan</label>
-                                {{ form.keterangan }}
-                                <div class="form-text">Contoh: Kontrak berlaku s.d Desember 2026.</div>
-                            </div>
-
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="{% url 'daftar_mitra' %}" class="btn btn-light border">Batal</a>
-                                <button type="submit" class="btn btn-primary px-4"><i class="fas fa-save me-2"></i>
-                                    Simpan Data</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="fas {{ icon }} text-warning me-2"></i> {{ title }}
+            </h2>
+            <p class="text-muted mb-0 small">Lengkapi profil mitra atau vendor baru.</p>
         </div>
+        <a href="{% url 'daftar_mitra' %}" class="btn btn-light border text-muted shadow-sm hover-arrow">
+            <i class="fas fa-arrow-left me-1"></i> <span class="d-none d-sm-inline">Kembali</span>
+        </a>
     </div>
 
-</body>
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
 
-</html>
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white py-3 px-4 border-bottom d-flex align-items-center">
+                    <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3 text-warning">
+                        <i class="fas fa-user-tie fa-lg"></i>
+                    </div>
+                    <h6 class="mb-0 fw-bold text-dark">Formulir Profil Mitra</h6>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="POST" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-secondary text-uppercase">Nama Lengkap
+                                Mitra</label>
+
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                {{ form.nama }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-secondary text-uppercase">Nomor WhatsApp /
+                                HP</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                {{ form.no_hp }}
+                            </div>
+                            <div class="form-text small text-muted ms-1">Pastikan nomor aktif dan terhubung dengan
+                                WhatsApp.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-secondary text-uppercase">Alamat
+                                Domisili</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0 text-muted align-items-start pt-2">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </span>
+                                {{ form.alamat }}
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small text-secondary text-uppercase">Keterangan /
+                                Catatan</label>
+                            <div class="bg-light p-3 rounded-3 border dashed-border">
+                                {{ form.keterangan }}
+                                <div class="d-flex align-items-center mt-2 text-muted small">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <span>Contoh: Kontrak bagi hasil 70:30, berlaku s.d 2026.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4 text-muted opacity-25">
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'daftar_mitra' %}"
+                                class="btn btn-light border px-4 py-2 fw-medium text-muted">
+                                Batal
+                            </a>
+                            <button type="submit" class="btn btn-primary px-4 py-2 shadow-sm fw-bold">
+                                <i class="fas fa-save me-2"></i> Simpan Data
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling khusus form */
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+
+    /* Input field focus effect */
+    .form-control:focus {
+        border-color: #ffc107;
+        /* Warna warning saat fokus sesuai tema Mitra */
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.15);
+        border-left: none;
+        /* Menyatu dengan icon */
+    }
+
+    /* Membuat border input menyatu dengan icon saat tidak fokus */
+    .form-control {
+        border-left: none;
+    }
+
+    /* Perbaikan border group agar terlihat utuh */
+    .input-group .input-group-text {
+        border-right: none;
+        background-color: #fff;
+    }
+
+    .dashed-border {
+        border: 1px dashed #dee2e6;
+    }
+
+    .hover-arrow:hover i {
+        transform: translateX(-3px);
+        transition: transform 0.2s;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Cari semua input, select, dan textarea di dalam form
+        var inputs = document.querySelectorAll('form input, form select, form textarea');
+
+        // Tambahkan class Bootstrap 'form-control' jika belum ada
+        inputs.forEach(function (input) {
+            if (!input.classList.contains('form-control')) {
+                input.classList.add('form-control');
+                input.classList.add('bg-white'); // Pastikan background putih
+            }
+
+            // Hapus style border bawaan input agar menyatu dengan input-group
+            input.style.borderLeft = "none";
+        });
+
+        // Khusus untuk textarea agar tidak ada icon di sampingnya (jika tidak pakai input-group)
+        var textareas = document.querySelectorAll('textarea');
+        textareas.forEach(function (ta) {
+            // Reset border untuk textarea di dalam dashed-box
+            if (ta.parentElement.classList.contains('dashed-border')) {
+                ta.classList.remove('form-control');
+                ta.classList.add('form-control-plaintext'); // Buat terlihat flat
+                ta.style.outline = "none";
+            }
+        });
+    });
+</script>
+
+{% endblock %}
