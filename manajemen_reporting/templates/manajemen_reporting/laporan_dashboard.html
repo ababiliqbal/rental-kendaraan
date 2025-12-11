@@ -1,122 +1,167 @@
-<!DOCTYPE html>
-<html lang="id">
+{% extends "manajemen_pegawai/dashboard_base.html" %}
 
-<head>
-    <title>Executive Reporting | AdminPro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% block title %}Executive Reporting Dashboard{% endblock %}
+{% block nav_reporting %}active{% endblock %}
 
-    <style>
+{% block content %}
+<style>
+    /* --- CUSTOM STYLING FOR EXECUTIVE LOOK --- */
+    .card-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        border-radius: 16px;
+    }
+
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* Gradient Cards */
+    .bg-gradient-blue {
+        background: linear-gradient(135deg, #0d6efd 0%, #0043a8 100%);
+        color: white;
+    }
+
+    .bg-gradient-green {
+        background: linear-gradient(135deg, #198754 0%, #0a5c36 100%);
+        color: white;
+    }
+
+    .metric-icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 15px;
+        backdrop-filter: blur(5px);
+    }
+
+    /* Section Headers */
+    .section-title {
+        font-weight: 700;
+        color: #495057;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-left: 15px;
+    }
+
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 5px;
+        bottom: 5px;
+        width: 5px;
+        background-color: #0d6efd;
+        border-radius: 5px;
+    }
+
+    /* Print Specifics */
+    @media print {
+
+        .no-print,
+        .modal,
+        .modal-backdrop {
+            display: none !important;
+        }
+
+        .sidebar,
+        .navbar {
+            display: none !important;
+        }
+
+        .main-content {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            border: 1px solid #eee !important;
+            box-shadow: none !important;
+            break-inside: avoid;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background-color: white !important;
+            -webkit-print-color-adjust: exact;
         }
 
-        .card-metric {
-            border-left: 5px solid;
-            transition: transform 0.2s;
+        /* Logic menyembunyikan section via JS */
+        .print-hidden {
+            display: none !important;
         }
+    }
+</style>
 
-        .card-metric:hover {
-            transform: translateY(-5px);
-        }
+<div class="container-fluid p-0">
 
-        .border-primary {
-            border-color: #0d6efd !important;
-        }
-
-        .border-success {
-            border-color: #198754 !important;
-        }
-
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-
-            .card {
-                border: 1px solid #ddd !important;
-                box-shadow: none !important;
-            }
-
-            body {
-                background-color: white;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="container py-5">
-
-        <div class="d-flex justify-content-between align-items-center mb-5 no-print">
-            <div>
-                <h2 class="fw-bold text-dark"><i class="fas fa-chart-line me-2 text-primary"></i> Laporan Kinerja</h2>
-                <p class="text-muted">Ringkasan performa bisnis dan keuangan rental.</p>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{% url 'dashboard_pegawai' %}" class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left me-1"></i> Kembali
-                </a>
-                <button onclick="window.print()" class="btn btn-primary">
-                    <i class="fas fa-print me-1"></i> Cetak PDF
-                </button>
-            </div>
+    <div class="d-flex justify-content-between align-items-center mb-5 no-print">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Executive Dashboard</h2>
+            <p class="text-muted mb-0">Laporan real-time kinerja operasional & finansial RentalPro.</p>
         </div>
+        <div>
+            <button type="button" class="btn btn-dark shadow-sm px-4 rounded-pill" data-bs-toggle="modal"
+                data-bs-target="#printModal">
+                <i class="fas fa-print me-2"></i> Opsi Cetak
+            </button>
+        </div>
+    </div>
 
+    <div id="print-metrics">
+        <h5 class="section-title">Ringkasan Utama</h5>
         <div class="row g-4 mb-5">
             <div class="col-md-6">
-                <div class="card shadow-sm border-0 card-metric border-primary h-100">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted text-uppercase fw-bold ls-1">Total Pendapatan</small>
-                                <h2 class="fw-bold text-primary mt-2">Rp {{ total_pendapatan|floatformat:0 }}</h2>
-                            </div>
-                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
-                                <i class="fas fa-wallet fa-2x"></i>
-                            </div>
+                <div class="card card-hover bg-gradient-blue shadow h-100">
+                    <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-white-50 text-uppercase fw-bold small ls-1 mb-1">Total Pendapatan Bersih</p>
+                            <h2 class="fw-bold mb-0">Rp {{ total_pendapatan|floatformat:0 }}</h2>
+                            <small class="text-white-50"><i class="fas fa-check-circle me-1"></i> Pembayaran
+                                Terverifikasi</small>
+                        </div>
+                        <div class="metric-icon text-white">
+                            <i class="fas fa-wallet fa-2x"></i>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="card shadow-sm border-0 card-metric border-success h-100">
-                    <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted text-uppercase fw-bold ls-1">Transaksi Sukses</small>
-                                <h2 class="fw-bold text-success mt-2">{{ total_transaksi }} <span
-                                        class="fs-6 text-muted">Sewa</span></h2>
-                            </div>
-                            <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
-                                <i class="fas fa-check-double fa-2x"></i>
-                            </div>
+                <div class="card card-hover bg-gradient-green shadow h-100">
+                    <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-white-50 text-uppercase fw-bold small ls-1 mb-1">Transaksi Sukses</p>
+                            <h2 class="fw-bold mb-0">{{ total_transaksi }} <span class="fs-6 opacity-75">Sewa</span>
+                            </h2>
+                            <small class="text-white-50"><i class="fas fa-history me-1"></i> Total Tagihan Lunas</small>
+                        </div>
+                        <div class="metric-icon text-white">
+                            <i class="fas fa-file-invoice-dollar fa-2x"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
+    <div id="print-charts">
+        <h5 class="section-title">Analisis Tren & Aset</h5>
         <div class="row g-4 mb-5">
             <div class="col-lg-8">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0 fw-bold"><i class="fas fa-chart-area me-2 text-muted"></i> Tren Pendapatan
-                            Bulanan</h6>
+                <div class="card card-hover shadow-sm h-100">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h6 class="mb-0 fw-bold text-dark">📈 Tren Pendapatan Bulanan</h6>
                     </div>
                     <div class="card-body">
-                        <canvas id="incomeChart" style="max-height: 300px;"></canvas>
+                        <canvas id="incomeChart" style="max-height: 320px;"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card shadow-sm border-0 h-100">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0 fw-bold"><i class="fas fa-trophy me-2 text-warning"></i> Top 5 Unit Terlaris
-                        </h6>
+                <div class="card card-hover shadow-sm h-100">
+                    <div class="card-header bg-white py-3 border-0">
+                        <h6 class="mb-0 fw-bold text-dark">🏆 Top 5 Unit Terlaris</h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body d-flex align-items-center justify-content-center">
                         <div style="position: relative; height: 250px; width: 100%;">
                             <canvas id="carChart"></canvas>
                         </div>
@@ -124,50 +169,54 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-bold"><i class="fas fa-file-alt me-2 text-muted"></i> Transaksi Terbaru (Lunas)</h6>
-                <small class="text-muted">10 Data Terakhir</small>
-            </div>
+    <div id="print-transactions" class="mb-5">
+        <h5 class="section-title">Aktivitas Keuangan Terbaru</h5>
+        <div class="card card-hover shadow-sm overflow-hidden">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light">
+                        <thead class="bg-light text-secondary small text-uppercase">
                             <tr>
-                                <th class="ps-4">ID Invoice</th>
-                                <th>Tanggal</th>
-                                <th>Penyewa</th>
-                                <th>Kendaraan</th>
-                                <th class="text-end pe-4">Total Bayar</th>
+                                <th class="ps-4 py-3">No. Invoice</th>
+                                <th class="py-3">Tanggal Bayar</th>
+                                <th class="py-3">Penyewa</th>
+                                <th class="py-3">Unit Kendaraan</th>
+                                <th class="text-end pe-4 py-3">Nominal</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for tagihan in transaksi_terbaru %}
                             <tr>
-                                <td class="ps-4 fw-bold text-primary">#{{ tagihan.id }}</td>
-
-                                <td>
+                                <td class="ps-4 fw-bold text-primary">#INV-{{ tagihan.id }}</td>
+                                <td class="text-muted">
                                     {% if tagihan.riwayat_pembayaran.last %}
                                     {{ tagihan.riwayat_pembayaran.last.tanggal|date:"d M Y" }}
-                                    {% else %}
-                                    -
-                                    {% endif %}
+                                    {% else %} - {% endif %}
                                 </td>
-
                                 <td>
-                                    {% with p=tagihan.reservasi.pelanggan %}
-                                    <div class="fw-bold">{{ p.first_name|default:p.username }}</div>
-                                    {% endwith %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 rounded-circle text-primary fw-bold d-flex align-items-center justify-content-center me-2"
+                                            style="width: 30px; height: 30px; font-size: 12px;">
+                                            {{ tagihan.reservasi.pelanggan.first_name|first|upper }}
+                                        </div>
+                                        <span class="fw-bold text-dark">
+                                            {{ tagihan.reservasi.pelanggan.first_name }}</span>
+                                    </div>
                                 </td>
-
-                                <td>{{ tagihan.reservasi.kendaraan.merk }} {{ tagihan.reservasi.kendaraan.model }}</td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ tagihan.reservasi.kendaraan.plat_nomor }}</span>
+                                    <span class="small ms-1">{{ tagihan.reservasi.kendaraan.merk }}</span>
+                                </td>
                                 <td class="text-end pe-4 fw-bold text-success">
-                                    Rp {{ tagihan.total_akhir|floatformat:0 }}</td>
+                                    Rp {{ tagihan.total_akhir|floatformat:0 }}
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">Belum ada data transaksi lunas.</td>
+                                <td colspan="5" class="text-center py-4 text-muted">Belum ada data transaksi.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -175,20 +224,19 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card shadow-sm border-0 mt-4 mb-5">
-            <div class="card-header bg-white py-3 border-warning border-bottom border-3">
-                <h6 class="mb-0 fw-bold"><i class="fas fa-handshake me-2 text-warning"></i> Laporan Bagi Hasil Mitra
-                </h6>
-            </div>
+    <div id="print-mitra">
+        <h5 class="section-title">Laporan Bagi Hasil Mitra</h5>
+        <div class="card card-hover shadow-sm border-0 mb-4 border-start border-4 border-warning">
             <div class="card-body p-0">
                 <table class="table table-striped align-middle mb-0">
-                    <thead>
+                    <thead class="bg-dark text-white small">
                         <tr>
-                            <th class="ps-4">Nama Mitra</th>
-                            <th>Unit Kendaraan</th>
-                            <th>Total Omset</th>
-                            <th class="text-end pe-4">Jatah Mitra (Setoran)</th>
+                            <th class="ps-4 py-3">Nama Mitra (Vendor)</th>
+                            <th class="py-3">Unit Aset</th>
+                            <th class="py-3">Total Omset Unit</th>
+                            <th class="text-end pe-4 py-3">Sharing Profit (Wajib Setor)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -196,104 +244,199 @@
                         <tr>
                             <td class="ps-4 fw-bold">{{ item.reservasi__kendaraan__mitra__nama }}</td>
                             <td>{{ item.reservasi__kendaraan__plat_nomor }}</td>
-                            <td>Rp {{ item.total_omset|floatformat:0 }}</td>
-                            <td class="text-end pe-4 fw-bold text-success">
+                            <td class="text-muted">Rp {{ item.total_omset|floatformat:0 }}</td>
+                            <td class="text-end pe-4 fw-bold text-warning text-dark">
                                 Rp {{ item.jatah_mitra|floatformat:0 }}
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center py-3">Belum ada transaksi untuk unit mitra.</td>
+                            <td colspan="4" class="text-center py-3 text-muted">Tidak ada unit mitra yang tersewa.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <div class="text-center mt-5 text-muted small no-print">
-            &copy; 2025 RentalPro Reporting System
-        </div>
-
     </div>
 
-    {{ chart_income_data|json_script:"income-data" }}
-    {{ chart_mobil_labels|json_script:"mobil-labels" }}
-    {{ chart_mobil_data|json_script:"mobil-data" }}
+    <div class="text-center mt-5 mb-5 text-muted small no-print">
+        <p>&copy; 2025 RentalPro Reporting Module.</p>
+    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Ambil data dengan aman dari script tag
-            const incomeData = JSON.parse(document.getElementById('income-data').textContent);
-            const mobilLabels = JSON.parse(document.getElementById('mobil-labels').textContent);
-            const mobilData = JSON.parse(document.getElementById('mobil-data').textContent);
+<div class="modal fade" id="printModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-print me-2"></i> Konfigurasi Cetak</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted small mb-3">Pilih bagian laporan yang ingin disertakan dalam dokumen PDF:</p>
 
-            // 1. Chart Pendapatan
-            const ctxIncome = document.getElementById('incomeChart');
-            if (ctxIncome) {
-                new Chart(ctxIncome, {
-                    type: 'line',
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="checkMetrics" checked>
+                    <label class="form-check-label fw-bold" for="checkMetrics">Ringkasan Metrik Utama</label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="checkCharts" checked>
+                    <label class="form-check-label fw-bold" for="checkCharts">Grafik & Analisis</label>
+                </div>
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="checkTrans" checked>
+                    <label class="form-check-label fw-bold" for="checkTrans">Tabel Transaksi Terbaru</label>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="checkMitra" checked>
+                    <label class="form-check-label fw-bold" for="checkMitra">Laporan Bagi Hasil Mitra</label>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-link text-muted text-decoration-none"
+                    data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary px-4 rounded-pill fw-bold" onclick="executePrint()">
+                    <i class="fas fa-print me-2"></i> Cetak Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ chart_income_data|json_script:"income-data" }}
+{{ chart_mobil_labels|json_script:"mobil-labels" }}
+{{ chart_mobil_data|json_script:"mobil-data" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // --- LOGIC FILTER CETAK ---
+    function executePrint() {
+        // 1. Ambil status checkbox
+        const showMetrics = document.getElementById('checkMetrics').checked;
+        const showCharts = document.getElementById('checkCharts').checked;
+        const showTrans = document.getElementById('checkTrans').checked;
+        const showMitra = document.getElementById('checkMitra').checked;
+
+        // 2. Ambil elemen section
+        const secMetrics = document.getElementById('print-metrics');
+        const secCharts = document.getElementById('print-charts');
+        const secTrans = document.getElementById('print-transactions');
+        const secMitra = document.getElementById('print-mitra');
+
+        // 3. Tambahkan class 'print-hidden' jika checkbox TIDAK dicentang
+        if (!showMetrics) secMetrics.classList.add('print-hidden');
+        if (!showCharts) secCharts.classList.add('print-hidden');
+        if (!showTrans) secTrans.classList.add('print-hidden');
+        if (!showMitra) secMitra.classList.add('print-hidden');
+
+        // 4. Tutup modal & Print
+        const modalEl = document.getElementById('printModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        setTimeout(() => {
+            window.print();
+
+            // 5. Reset tampilan (Hapus class hidden) setelah print dialog tertutup
+            secMetrics.classList.remove('print-hidden');
+            secCharts.classList.remove('print-hidden');
+            secTrans.classList.remove('print-hidden');
+            secMitra.classList.remove('print-hidden');
+        }, 500);
+    }
+
+    // --- CHART CONFIGURATION ---
+    document.addEventListener("DOMContentLoaded", function () {
+        const incomeData = JSON.parse(document.getElementById('income-data').textContent);
+        const mobilLabels = JSON.parse(document.getElementById('mobil-labels').textContent);
+        const mobilData = JSON.parse(document.getElementById('mobil-data').textContent);
+
+        // Chart 1: Pendapatan
+        const ctxIncome = document.getElementById('incomeChart');
+        if (ctxIncome) {
+            new Chart(ctxIncome, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                    datasets: [{
+                        label: 'Pendapatan (Rp)',
+                        data: incomeData,
+                        borderColor: '#0d6efd',
+                        backgroundColor: (context) => {
+                            const ctx = context.chart.ctx;
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, 'rgba(13, 110, 253, 0.2)');
+                            gradient.addColorStop(1, 'rgba(13, 110, 253, 0)');
+                            return gradient;
+                        },
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#0d6efd',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { borderDash: [2, 4], color: '#f0f0f0' },
+                            ticks: { font: { family: "'Segoe UI', sans-serif" } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { family: "'Segoe UI', sans-serif" } }
+                        }
+                    },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
+        }
+
+        // Chart 2: Unit Terlaris
+        const ctxCar = document.getElementById('carChart');
+        if (ctxCar) {
+            const totalSewa = mobilData.reduce((a, b) => a + b, 0);
+            if (totalSewa === 0) {
+                ctxCar.parentElement.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-chart-pie fa-3x mb-3 opacity-25"></i><br>
+                        <small>Belum ada data penyewaan</small>
+                    </div>`;
+            } else {
+                new Chart(ctxCar, {
+                    type: 'doughnut',
                     data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+                        labels: mobilLabels,
                         datasets: [{
-                            label: 'Pendapatan (Rp)',
-                            data: incomeData,
-                            borderColor: '#0d6efd',
-                            backgroundColor: 'rgba(13, 110, 253, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 4
+                            data: mobilData,
+                            backgroundColor: ['#0d6efd', '#20c997', '#ffc107', '#dc3545', '#6610f2'],
+                            borderWidth: 0,
+                            hoverOffset: 4
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
-                            x: { grid: { display: false } }
-                        }
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { usePointStyle: true, padding: 20, font: { size: 11 } }
+                            }
+                        },
+                        cutout: '70%',
+                        layout: { padding: 10 }
                     }
                 });
             }
-
-            // 2. Chart Mobil Terlaris
-            const ctxCar = document.getElementById('carChart');
-            if (ctxCar) {
-                // Jika data kosong, tampilkan pesan manual (bukan chart kosong)
-                const totalSewa = mobilData.reduce((a, b) => a + b, 0);
-
-                if (totalSewa === 0) {
-                    ctxCar.parentElement.innerHTML = "<div class='text-center text-muted small py-5'>Belum ada data penyewaan</div>";
-                } else {
-                    new Chart(ctxCar, {
-                        type: 'doughnut',
-                        data: {
-                            labels: mobilLabels,
-                            datasets: [{
-                                data: mobilData,
-                                backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6f42c1'],
-                                borderWidth: 2,
-                                borderColor: '#fff'
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
-                            },
-                            cutout: '75%'
-                        }
-                    });
-                }
-            }
-        });
-    </script>
-
-</body>
-
-</html>
+        }
+    });
+</script>
+{% endblock %}

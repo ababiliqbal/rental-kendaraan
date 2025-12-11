@@ -200,12 +200,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'daftar_armada' %}" class="nav-link">
+                    <a href="{% url 'daftar_armada' %}" class="nav-link {% block nav_armada %}{% endblock %}">
                         <i class="fas fa-car"></i> Kelola Armada
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'daftar_mitra' %}" class="nav-link">
+                    <a href="{% url 'daftar_mitra' %}" class="nav-link {% block nav_mitra %}{% endblock %}">
                         <i class="fas fa-handshake"></i> Data Mitra
                     </a>
                 </li>
