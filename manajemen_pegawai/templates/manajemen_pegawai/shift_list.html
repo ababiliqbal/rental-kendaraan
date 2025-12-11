@@ -1,0 +1,54 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+{% block title %}Data Shift{% endblock %}
+{% block nav_shift %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold text-dark mb-0">Manajemen Shift</h3>
+        <a href="{% url 'shift_create' %}" class="btn btn-success shadow-sm">
+            <i class="fas fa-plus me-2"></i> Tambah Shift
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for shift in daftar_shift %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-bold text-primary mb-0">{{ shift.get_nama_shift_display }}</h5>
+                        <span class="badge bg-light text-dark border">ID: {{ shift.id }}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3 bg-light p-3 rounded">
+                        <div class="text-center">
+                            <small class="text-muted d-block fw-bold">MULAI</small>
+                            <span class="fs-5">{{ shift.jam_mulai|time:"H:i" }}</span>
+                        </div>
+                        <div class="align-self-center text-muted"><i class="fas fa-arrow-right"></i></div>
+                        <div class="text-center">
+                            <small class="text-muted d-block fw-bold">SELESAI</small>
+                            <span class="fs-5">{{ shift.jam_selesai|time:"H:i" }}</span>
+                        </div>
+                    </div>
+
+                    <p class="mb-0 text-muted small"><i class="fas fa-money-bill-wave me-2"></i> Tunjangan: <span
+                            class="fw-bold text-success">Rp {{ shift.tunjangan_shift|floatformat:0 }}</span></p>
+                </div>
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-end gap-2 pb-3">
+                    <a href="{% url 'shift_update' shift.pk %}" class="btn btn-sm btn-outline-warning"><i
+                            class="fas fa-edit"></i> Edit</a>
+                    <a href="{% url 'shift_delete' shift.pk %}" class="btn btn-sm btn-outline-danger"><i
+                            class="fas fa-trash"></i> Hapus</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">Belum ada data shift.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

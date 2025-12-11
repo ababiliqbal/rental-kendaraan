@@ -1,0 +1,60 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+
+{% block title %}Hapus Jadwal Kerja{% endblock %}
+{% block nav_jadwal %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0 d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+
+    <div class="card shadow border-0 text-center" style="max-width: 500px; width: 100%;">
+        <div class="card-header bg-danger text-white py-3">
+            <h5 class="mb-0 fw-bold"><i class="fas fa-trash-alt me-2"></i> Konfirmasi Penghapusan</h5>
+        </div>
+
+        <div class="card-body p-5">
+            <div class="mb-4 text-danger opacity-75">
+                <i class="fas fa-calendar-times fa-5x"></i>
+            </div>
+
+            <h4 class="fw-bold text-dark mb-3">Hapus Jadwal Ini?</h4>
+
+            <div class="alert alert-light border text-start mb-4 bg-light">
+                <h6 class="text-uppercase text-muted fw-bold x-small mb-2 border-bottom pb-2">Detail Data</h6>
+                <div class="row g-2 small">
+                    <div class="col-4 fw-bold text-muted">Pegawai:</div>
+                    <div class="col-8 text-dark fw-bold">{{ object.pegawai.user.get_full_name }}</div>
+
+                    <div class="col-4 fw-bold text-muted">Shift:</div>
+                    <div class="col-8 text-dark">{{ object.shift.get_nama_shift_display }}</div>
+
+                    <div class="col-4 fw-bold text-muted">Periode:</div>
+                    <div class="col-8 text-dark">
+                        {{ object.tanggal_mulai|date:"d/m/Y" }}
+                        s.d
+                        {% if object.tanggal_selesai %}
+                        {{ object.tanggal_selesai|date:"d/m/Y" }}
+                        {% else %}
+                        <span class="text-success fst-italic">Seterusnya</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-muted small mb-4">
+                Tindakan ini bersifat permanen dan data jadwal tidak dapat dikembalikan.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2 d-md-flex justify-content-center">
+                    <a href="{% url 'jadwal_list' %}" class="btn btn-secondary px-4">Batal</a>
+                    <button type="submit" class="btn btn-danger px-4 fw-bold">
+                        <i class="fas fa-check me-2"></i> Ya, Hapus
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

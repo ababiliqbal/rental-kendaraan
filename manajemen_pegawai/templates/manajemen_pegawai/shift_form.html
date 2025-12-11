@@ -1,0 +1,44 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+{% block title %}Form Shift{% endblock %}
+{% block nav_shift %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">{% if object %}Edit Shift{% else %}Tambah Shift Baru{% endif %}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">Nama Shift</label>
+                            {{ form.nama_shift }}
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold small">Jam Mulai</label>
+                                {{ form.jam_mulai }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold small">Jam Selesai</label>
+                                {{ form.jam_selesai }}
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold small">Tunjangan (Rp)</label>
+                            {{ form.tunjangan_shift }}
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'shift_list' %}" class="btn btn-light border">Batal</a>
+                            <button type="submit" class="btn btn-success fw-bold px-4">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

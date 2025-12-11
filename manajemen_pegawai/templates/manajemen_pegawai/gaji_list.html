@@ -1,0 +1,107 @@
+{% extends "manajemen_pegawai/dashboard_base.html" %}
+{% block title %}Slip Gaji Pegawai{% endblock %}
+{% block nav_gaji %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-0">Slip Gaji Pegawai</h3>
+            <p class="text-muted mb-0">Kelola dan cetak slip gaji karyawan.</p>
+        </div>
+        <a href="{% url 'gaji_create' %}" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus me-2"></i> Buat Slip Gaji
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Pegawai</th>
+                            <th>Periode Gaji</th>
+                            <th>Gaji Pokok</th>
+                            <th>Tunjangan</th>
+                            <th>Potongan</th>
+                            <th>Total Terima</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for gaji in gaji_list %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold">{{ gaji.pegawai.user.get_full_name }}</div>
+                                <small class="text-muted">{{ gaji.pegawai.jabatan }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ gaji.bulan|date:"F Y" }}
+                                </span>
+                            </td>
+                            <td>Rp {{ gaji.gaji_pokok|floatformat:0 }}</td>
+                            <td class="text-success">+ Rp {{ gaji.tunjangan|floatformat:0 }}</td>
+                            <td class="text-danger">- Rp {{ gaji.potongan|floatformat:0 }}</td>
+                            <td class="fw-bold text-primary">Rp {{ gaji.total_gaji|floatformat:0 }}</td>
+                            <td>
+                                {% if gaji.status == 'Sudah Dibayar' %}
+                                <span class="badge bg-success">Lunas</span>
+                                {% elif gaji.status == 'Menunggu Verifikasi' %}
+                                <span class="badge bg-warning text-dark">Verifikasi</span>
+                                {% else %}
+                                <span class="badge bg-danger">Belum Dibayar</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'gaji_detail' gaji.pk %}" class="btn btn-sm btn-outline-info me-1"
+                                    title="Detail">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'gaji_update' gaji.pk %}" class="btn btn-sm btn-outline-warning"
+                                    title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5">
+                                <div class="text-muted mb-2"><i class="fas fa-file-invoice-dollar fa-3x opacity-50"></i>
+                                </div>
+                                <p class="text-muted">Belum ada data slip gaji yang dibuat.</p>
+                                <a href="{% url 'gaji_create' %}" class="btn btn-sm btn-outline-primary mt-2">Buat Slip
+                                    Gaji Baru</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if is_paginated %}
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Sebelumnya</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Sebelumnya</span></li>
+            {% endif %}
+
+            <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Berikutnya</a></li>
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">Berikutnya</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,17 +1,25 @@
+import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.utils import timezone
-from django.db import transaction # WAJIB IMPORT INI
+from django.db import transaction
 
-# Import Model dari App Tetangga
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
+from django.contrib.auth.models import User 
+
 from manajemen_pengguna.models import Reservasi, Tagihan, Denda
 from kendaraan_ext.models import Kendaraan, Mitra
-from .forms import FormPengembalian, KendaraanForm, MobilForm, MotorForm, MitraForm
-import datetime
+from .models import Pegawai, Shift, JadwalKerja, HistoriKerjaPegawai, GajiPegawai, Penghargaan
 
-# --- DECORATOR KHUSUS ---
-# Hanya user dengan flag is_pegawai=True atau Superuser yang boleh masuk
+from .forms import (
+    FormPengembalian, KendaraanForm, MobilForm, MotorForm, MitraForm,
+    PegawaiForm, ShiftForm, JadwalKerjaForm, HistoriKerjaPegawaiForm, 
+    GajiPegawaiForm, PenghargaanForm
+)
+
 def cek_pegawai(user):
     return user.is_authenticated and (user.is_superuser or user.profil.is_pegawai)
 
@@ -336,3 +344,217 @@ def hapus_mitra(request, pk):
         mitra.delete()
         messages.success(request, f"Mitra '{nama}' telah dihapus.")
         return redirect('daftar_mitra')
+    
+class PegawaiListView(LoginRequiredMixin, ListView):
+    model = Pegawai
+    template_name = 'manajemen_pegawai/pegawai_list.html'
+    context_object_name = 'pegawai_list'
+    paginate_by = 10
+
+class PegawaiDetailView(LoginRequiredMixin, DetailView):
+    model = Pegawai
+    template_name = 'manajemen_pegawai/pegawai_detail.html'
+    context_object_name = 'pegawai'
+
+class PegawaiCreateView(LoginRequiredMixin, CreateView):
+    model = Pegawai
+    form_class = PegawaiForm
+    template_name = 'manajemen_pegawai/pegawai_form.html'
+    success_url = reverse_lazy('pegawai_list')
+
+    def form_valid(self, form):
+        first_name = form.cleaned_data.get("first_name")
+        last_name = form.cleaned_data.get("last_name")
+        email = form.cleaned_data.get("email")
+
+        if not email:
+             messages.error(self.request, 'Email wajib diisi untuk membuat akun.')
+             return self.form_invalid(form)
+
+        username = email.split("@")[0]
+        # Auto-create User Django
+        user = User.objects.create_user(
+            username=username,
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password="pegawai123" 
+        )
+        form.instance.user = user
+        messages.success(self.request, 'Pegawai baru berhasil ditambahkan!')
+        return super().form_valid(form)
+
+class PegawaiUpdateView(LoginRequiredMixin, UpdateView):
+    model = Pegawai
+    form_class = PegawaiForm
+    template_name = 'manajemen_pegawai/pegawai_form.html'
+    success_url = reverse_lazy('pegawai_list')
+    
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.object.user:
+            initial['first_name'] = self.object.user.first_name
+            initial['last_name'] = self.object.user.last_name
+            initial['email'] = self.object.user.email
+        return initial
+    
+    def form_valid(self, form):
+        user = self.object.user
+        user.first_name = form.cleaned_data.get("first_name")
+        user.last_name = form.cleaned_data.get("last_name")
+        user.email = form.cleaned_data.get("email")
+        user.save()
+        messages.success(self.request, 'Data pegawai berhasil diperbarui!')
+        return super().form_valid(form)
+
+class PegawaiDeleteView(LoginRequiredMixin, DeleteView):
+    model = Pegawai
+    template_name = 'manajemen_pegawai/pegawai_confirm_delete.html'
+    success_url = reverse_lazy('pegawai_list')
+
+    def delete(self, request, *args, **kwargs):
+        pegawai_obj = self.get_object()
+        response = super().delete(request, *args, **kwargs)
+        messages.success(request, f'Pegawai {pegawai_obj.user.get_full_name()} berhasil dihapus!')
+        return response
+
+# --- SHIFT ---
+class ShiftListView(LoginRequiredMixin, ListView):
+    model = Shift
+    template_name = 'manajemen_pegawai/shift_list.html'
+    context_object_name = 'daftar_shift'
+
+class ShiftCreateView(LoginRequiredMixin, CreateView):
+    model = Shift
+    form_class = ShiftForm
+    template_name = 'manajemen_pegawai/shift_form.html'
+    success_url = reverse_lazy('shift_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Shift baru berhasil ditambahkan!")
+        return super().form_valid(form)
+
+class ShiftUpdateView(LoginRequiredMixin, UpdateView):
+    model = Shift
+    form_class = ShiftForm
+    template_name = 'manajemen_pegawai/shift_form.html'
+    success_url = reverse_lazy('shift_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Shift '{self.object.get_nama_shift_display()}' berhasil diperbarui!")
+        return super().form_valid(form)
+
+class ShiftDetailView(LoginRequiredMixin, DetailView):
+    model = Shift
+    template_name = 'manajemen_pegawai/shift_detail.html'
+    context_object_name = 'shift'
+
+class ShiftDeleteView(LoginRequiredMixin, DeleteView):
+    model = Shift
+    template_name = 'manajemen_pegawai/shift_confirm_delete.html'
+    success_url = reverse_lazy('shift_list')
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object() 
+        shift_nama = obj.get_nama_shift_display()
+        response = super().delete(request, *args, **kwargs)
+        messages.success(request, f"Shift '{shift_nama}' berhasil dihapus!")
+        return response
+
+# --- JADWAL KERJA ---
+class JadwalKerjaListView(LoginRequiredMixin, ListView):
+    model = JadwalKerja
+    template_name = 'manajemen_pegawai/jadwal_list.html'
+    context_object_name = 'jadwal_list'
+    ordering = ['-tanggal_mulai']
+
+class JadwalKerjaCreateView(LoginRequiredMixin, CreateView):
+    model = JadwalKerja
+    form_class = JadwalKerjaForm
+    template_name = 'manajemen_pegawai/jadwal_form.html'
+    success_url = reverse_lazy('jadwal_list')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Jadwal kerja berhasil ditambahkan!")
+        return response
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                if field == '__all__':
+                    messages.error(self.request, f"Gagal membuat jadwal: {error}")
+                else:
+                    field_name = form.fields.get(field).label or field.capitalize()
+                    messages.error(self.request, f"Gagal membuat jadwal ({field_name}): {error}")
+        return super().form_invalid(form)
+
+class JadwalKerjaDetailView(LoginRequiredMixin, DetailView):
+    model = JadwalKerja
+    template_name = 'manajemen_pegawai/jadwal_detail.html'
+    context_object_name = 'jadwal'
+
+class JadwalKerjaUpdateView(LoginRequiredMixin, UpdateView):
+    model = JadwalKerja
+    form_class = JadwalKerjaForm
+    template_name = 'manajemen_pegawai/jadwal_form.html'
+    success_url = reverse_lazy('jadwal_list')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Jadwal kerja berhasil diperbarui!")
+        return response
+
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            for error in errors:
+                if field == '__all__':
+                    messages.error(self.request, f"Gagal memperbarui jadwal: {error}")
+                else:
+                    field_name = form.fields.get(field).label or field.capitalize()
+                    messages.error(self.request, f"Gagal memperbarui jadwal ({field_name}): {error}")
+        return super().form_invalid(form)
+
+class JadwalKerjaDeleteView(LoginRequiredMixin, DeleteView):
+    model = JadwalKerja
+    template_name = 'manajemen_pegawai/jadwal_confirm_delete.html'
+    success_url = reverse_lazy('jadwal_list')
+    context_object_name = 'jadwal'
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, "Jadwal kerja berhasil dihapus!")
+        return response
+
+# --- GAJI ---
+class GajiPegawaiListView(LoginRequiredMixin, ListView):
+    model = GajiPegawai
+    template_name = 'manajemen_pegawai/gaji_list.html'
+    context_object_name = 'gaji_list'
+    paginate_by = 10
+    ordering = ['-bulan']
+
+class GajiPegawaiCreateView(LoginRequiredMixin, CreateView):
+    model = GajiPegawai
+    form_class = GajiPegawaiForm
+    template_name = 'manajemen_pegawai/gaji_form.html'
+    success_url = reverse_lazy('gaji_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Slip gaji berhasil dibuat!")
+        return super().form_valid(form)
+
+class GajiPegawaiUpdateView(LoginRequiredMixin, UpdateView):
+    model = GajiPegawai
+    form_class = GajiPegawaiForm
+    template_name = 'manajemen_pegawai/gaji_form.html'
+    success_url = reverse_lazy('gaji_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Slip gaji berhasil diperbarui!")
+        return super().form_valid(form)
+
+class GajiPegawaiDetailView(LoginRequiredMixin, DetailView):
+    model = GajiPegawai
+    template_name = 'manajemen_pegawai/gaji_detail.html'
+    context_object_name = 'gaji'
