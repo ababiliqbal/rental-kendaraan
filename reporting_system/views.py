@@ -4,7 +4,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.db.models import Count, Sum, Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -166,6 +166,21 @@ def vehicle_report(request):
 
 
 @staff_member_required
+def maintenance_report(request):
+    """View untuk laporan perawatan kendaraan"""
+    perawatan = Kendaraan.objects.filter(status='Perawatan')
+    stats = {
+        'total_vehicles': Kendaraan.objects.count(),
+        'maintenance_vehicles': perawatan.count(),
+    }
+    context = {
+        'stats': stats,
+        'vehicles': perawatan,
+    }
+    return render(request, 'reporting_system/maintenance_report.html', context)
+
+
+@staff_member_required
 def user_report(request):
     """View untuk laporan pengguna"""
     from django.utils.timezone import now
@@ -251,6 +266,28 @@ def report_delete(request, pk):
         'report': report,
     }
     return render(request, 'reporting_system/report_confirm_delete.html', context)
+
+
+@staff_member_required
+def export_reports_csv(request):
+    """Ekspor seluruh laporan ke CSV sederhana"""
+    reports = Report.objects.all().order_by('-created_date')
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="reports.csv"'
+
+    response.write("id,title,report_type,status,start_date,end_date,created_date\n")
+    for r in reports:
+        row = [
+            r.id,
+            f'"{r.title.replace('"', '""')}"',
+            r.report_type,
+            r.status,
+            r.start_date or '',
+            r.end_date or '',
+            r.created_date,
+        ]
+        response.write(",".join(map(str, row)) + "\n")
+    return response
 
 
 @staff_member_required
