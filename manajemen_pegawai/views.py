@@ -6,8 +6,8 @@ from django.db import transaction # WAJIB IMPORT INI
 
 # Import Model dari App Tetangga
 from manajemen_pengguna.models import Reservasi, Tagihan, Denda
-from kendaraan_ext.models import Kendaraan
-from .forms import FormPengembalian, KendaraanForm, MobilForm, MotorForm
+from kendaraan_ext.models import Kendaraan, Mitra
+from .forms import FormPengembalian, KendaraanForm, MobilForm, MotorForm, MitraForm
 import datetime
 
 # --- DECORATOR KHUSUS ---
@@ -289,3 +289,50 @@ def edit_armada(request, pk):
     
     # Kita gunakan template yang sama dengan Tambah Armada
     return render(request, 'manajemen_pegawai/form_armada.html', context)
+
+# ==========================================
+# MANAJEMEN MITRA
+# ==========================================
+
+@user_passes_test(cek_pegawai, login_url='home')
+def daftar_mitra(request):
+    mitra_list = Mitra.objects.all().order_by('nama')
+    return render(request, 'manajemen_pegawai/daftar_mitra.html', {'mitra_list': mitra_list})
+
+@user_passes_test(cek_pegawai, login_url='home')
+def tambah_mitra(request):
+    if request.method == 'POST':
+        form = MitraForm(request.POST)
+        if form.is_valid():
+            mitra = form.save()
+            messages.success(request, f"Mitra '{mitra.nama}' berhasil ditambahkan!")
+            return redirect('daftar_mitra')
+    else:
+        form = MitraForm()
+    
+    context = {'form': form, 'title': 'Tambah Mitra Baru', 'icon': 'fa-handshake'}
+    return render(request, 'manajemen_pegawai/form_mitra.html', context)
+
+@user_passes_test(cek_pegawai, login_url='home')
+def edit_mitra(request, pk):
+    mitra = get_object_or_404(Mitra, pk=pk)
+    if request.method == 'POST':
+        form = MitraForm(request.POST, instance=mitra)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Data Mitra '{mitra.nama}' berhasil diperbarui!")
+            return redirect('daftar_mitra')
+    else:
+        form = MitraForm(instance=mitra)
+    
+    context = {'form': form, 'title': 'Edit Data Mitra', 'icon': 'fa-edit'}
+    return render(request, 'manajemen_pegawai/form_mitra.html', context)
+
+@user_passes_test(cek_pegawai, login_url='home')
+def hapus_mitra(request, pk):
+    mitra = get_object_or_404(Mitra, pk=pk)
+    if request.method == 'POST':
+        nama = mitra.nama
+        mitra.delete()
+        messages.success(request, f"Mitra '{nama}' telah dihapus.")
+        return redirect('daftar_mitra')

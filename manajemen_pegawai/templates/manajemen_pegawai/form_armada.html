@@ -50,7 +50,36 @@
                                     <label class="form-label small fw-bold">Status Awal</label>
                                     {{ k_form.status }}
                                 </div>
-                                <div class="col-12">
+
+                                <div class="col-12 mt-3">
+                                    <div class="card bg-warning bg-opacity-10 border-warning border-opacity-25">
+                                        <div class="card-body p-3">
+                                            <h6 class="fw-bold small text-warning text-uppercase mb-2">
+                                                <i class="fas fa-handshake me-1"></i> Data Kepemilikan (Opsional)
+                                            </h6>
+                                            <div class="row g-3">
+                                                <div class="col-md-8">
+                                                    <label class="form-label small fw-bold text-muted">Pemilik
+                                                        (Mitra)</label>
+                                                    {{ k_form.mitra }}
+                                                    <div class="form-text" style="font-size: 11px;">
+                                                        Pilih nama mitra jika ini adalah unit titipan. Kosongkan
+                                                        ("---------") jika milik perusahaan sendiri.
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label class="form-label small fw-bold text-muted">Bagi Hasil Mitra
+                                                        (%)</label>
+                                                    <div class="input-group input-group-sm">
+                                                        {{ k_form.persentase_mitra }}
+                                                        <span class="input-group-text">%</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
                                     <label class="form-label small fw-bold">Foto Kendaraan</label>
                                     {% if k_form.instance.gambar %}
                                     <div class="mb-2">

@@ -176,6 +176,41 @@
             </div>
         </div>
 
+        <div class="card shadow-sm border-0 mt-4 mb-5">
+            <div class="card-header bg-white py-3 border-warning border-bottom border-3">
+                <h6 class="mb-0 fw-bold"><i class="fas fa-handshake me-2 text-warning"></i> Laporan Bagi Hasil Mitra
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Nama Mitra</th>
+                            <th>Unit Kendaraan</th>
+                            <th>Total Omset</th>
+                            <th class="text-end pe-4">Jatah Mitra (Setoran)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in laporan_mitra %}
+                        <tr>
+                            <td class="ps-4 fw-bold">{{ item.reservasi__kendaraan__mitra__nama }}</td>
+                            <td>{{ item.reservasi__kendaraan__plat_nomor }}</td>
+                            <td>Rp {{ item.total_omset|floatformat:0 }}</td>
+                            <td class="text-end pe-4 fw-bold text-success">
+                                Rp {{ item.jatah_mitra|floatformat:0 }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3">Belum ada transaksi untuk unit mitra.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="text-center mt-5 text-muted small no-print">
             &copy; 2025 RentalPro Reporting System
         </div>

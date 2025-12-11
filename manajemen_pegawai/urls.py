@@ -12,6 +12,11 @@ urlpatterns = [
     path('armada/', views.daftar_armada, name='daftar_armada'),
     path('armada/tambah-mobil/', views.tambah_mobil, name='tambah_mobil'),
     path('armada/tambah-motor/', views.tambah_motor, name='tambah_motor'),
-    path('armada/edit/<int:pk>/', views.edit_armada, name='edit_armada'), # <--- Tambahkan ini
+    path('armada/edit/<int:pk>/', views.edit_armada, name='edit_armada'), 
     path('armada/hapus/<int:pk>/', views.hapus_kendaraan, name='hapus_kendaraan'),
+    
+    path('mitra/', views.daftar_mitra, name='daftar_mitra'),
+    path('mitra/tambah/', views.tambah_mitra, name='tambah_mitra'),
+    path('mitra/edit/<int:pk>/', views.edit_mitra, name='edit_mitra'),
+    path('mitra/hapus/<int:pk>/', views.hapus_mitra, name='hapus_mitra'),
 ]

@@ -1,6 +1,18 @@
 from django.db import models
 
 # ==========================================
+# 0. MITRA (New Model - Vendor Management)
+# ==========================================
+class Mitra(models.Model):
+    nama = models.CharField(max_length=100)
+    no_hp = models.CharField(max_length=20)
+    alamat = models.TextField(blank=True)
+    keterangan = models.TextField(blank=True, help_text="Catatan khusus kontrak mitra")
+
+    def __str__(self):
+        return self.nama
+
+# ==========================================
 # 1. KENDARAAN (Induk / Base Model)
 # ==========================================
 class Kendaraan(models.Model):
@@ -8,11 +20,6 @@ class Kendaraan(models.Model):
         ("Tersedia", "Tersedia"),
         ("Dirental", "Dirental"),
         ("Perawatan", "Perawatan"),
-    ]
-
-    KEPEMILIKAN_CHOICES = [
-        ("Milik Sendiri", "Milik Sendiri"),
-        ("Mitra", "Mitra"),
     ]
 
     # Atribut Dasar
@@ -26,19 +33,35 @@ class Kendaraan(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Tersedia")
     gambar = models.ImageField(upload_to='kendaraan/', blank=True, null=True)
 
-    # Atribut Kemitraan
-    tipe_kepemilikan = models.CharField(max_length=20, choices=KEPEMILIKAN_CHOICES, default="Milik Sendiri")
-    id_mitra = models.CharField(max_length=50, null=True, blank=True)
-    persen_bagi_hasil = models.FloatField(default=0.0)
+    # Atribut Kemitraan (Relational Update)
+    # Jika mitra kosong (null), berarti milik perusahaan sendiri
+    mitra = models.ForeignKey(
+        Mitra, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='list_kendaraan',
+        help_text="Kosongkan jika kendaraan ini milik perusahaan sendiri (Aset Internal)"
+    )
+    persentase_mitra = models.IntegerField(
+        default=0, 
+        help_text="Berapa % bagi hasil untuk mitra? (Contoh: 70)"
+    )
 
     class Meta:
         verbose_name = "Kendaraan"
         verbose_name_plural = "Daftar Kendaraan"
 
     def __str__(self):
-        prefix = "[MITRA] " if self.tipe_kepemilikan == "Mitra" else ""
+        # Tambahkan label [MITRA] otomatis jika ada pemiliknya
+        prefix = f"[MITRA: {self.mitra.nama}] " if self.mitra else ""
         return f"{prefix}{self.merk} {self.model} ({self.plat_nomor})"
     
+    # Helper Property untuk mengecek status kepemilikan di Template/Views
+    @property
+    def is_mitra(self):
+        return self.mitra is not None
+
     @property
     def cek_mobil(self):
         try:
