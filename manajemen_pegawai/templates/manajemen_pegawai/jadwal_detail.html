@@ -1,0 +1,74 @@
+{% extends "based.html" %}
+{% load l10n %}
+
+{% block title %}
+Detail Jadwal Pegawai: {{ object.pegawai.user.get_full_name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-lg mb-5 bg-white rounded">
+
+            <!-- Header -->
+            <div class="card-header bg-info text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i> Detail Jadwal Pegawai
+                </h2>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+                    <!-- Sidebar Pegawai -->
+                    <div class="col-md-4 text-center border-end">
+                        <i class="fas fa-user-circle fa-7x text-secondary my-4"></i>
+                        <h3 class="mt-2 text-primary">{{ object.pegawai.user.get_full_name }}</h3>
+                        <p class="text-muted">{{ object.pegawai.jabatan }}</p>
+                    </div>
+
+                    <!-- Detail Jadwal -->
+                    <div class="col-md-8">
+
+                        <h4 class="border-bottom pb-2 mb-3 text-info">Informasi Jadwal</h4>
+
+                        <dl class="row">
+
+                            <dt class="col-sm-4">Pegawai:</dt>
+                            <dd class="col-sm-8">{{ object.pegawai.user.get_full_name }}</dd>
+
+                            <dt class="col-sm-4">Shift:</dt>
+                            <dd class="col-sm-8">{{ object.shift }}</dd>
+
+                            <dt class="col-sm-4">Tanggal Mulai:</dt>
+                            <dd class="col-sm-8">{{ object.tanggal_mulai|date:"d F Y" }}</dd>
+
+                            <dt class="col-sm-4">Tanggal Selesai:</dt>
+                            <dd class="col-sm-8">{{ object.tanggal_selesai|date:"d F Y" }}</dd>
+
+                        </dl>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="card-footer d-flex justify-content-end gap-2">
+                <a href="{% url 'jadwal_update' pk=object.pk %}" class="btn btn-warning btn-sm text-dark">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'jadwal_delete' pk=object.pk %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash-alt me-1"></i> Hapus
+                </a>
+                <a href="{% url 'jadwal_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list me-1"></i> Kembali ke Daftar
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

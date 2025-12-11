@@ -1,0 +1,57 @@
+{% extends "based.html" %}
+
+{% block title %}Konfirmasi Penghapusan Shift{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-6 col-md-8">
+
+        <div class="card shadow-lg border-danger">
+
+            <div class="card-header bg-danger text-white text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i> PERINGATAN PENGHAPUSAN
+                </h2>
+            </div>
+
+            <div class="card-body text-center">
+
+                <p class="lead">
+                    Apakah Anda YAKIN ingin menghapus shift ini?
+                </p>
+
+                <div class="alert alert-danger" role="alert">
+                    Data shift yang akan dihapus:
+                    <br>
+                    <strong>Nama Shift: {{ object.get_nama_shift_display|default:object.nama_shift }}</strong>
+                    <br>
+                    <strong>Waktu: {{ object.jam_mulai|time:"H:i" }} - {{ object.jam_selesai|time:"H:i" }}</strong>
+                    <br>
+                    <strong>Tunjangan: Rp. {{ object.tunjangan_shift|floatformat:0 }}</strong>
+                </div>
+
+                <p class="text-muted">
+                    Tindakan ini tidak dapat dibatalkan dan akan menghapus data shift secara permanen.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-danger btn-lg me-3">
+                        <i class="fas fa-trash-alt me-1"></i> Ya, Hapus Permanen
+                    </button>
+
+                    <a href="{% url 'shift_list' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </a>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,112 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Detail Pegawai</title>
+{% extends "based.html" %} 
+{% load l10n %}
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% block title %}Detail Pegawai: {{ object.user.get_full_name }}{% endblock %}
 
-    <style>
-        body {
-            background: #f8f9fc;
-            font-family: Arial, sans-serif;
-        }
+{% block content %}
 
-        .main-card {
-            border-radius: 16px;
-            padding: 25px;
-            background: white;
-            max-width: 700px;
-            margin: auto;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.08);
-        }
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg mb-5 bg-white rounded">
+                
+                <div class="card-header bg-info text-white">
+                    <h2 class="mb-0">
+                        <i class="fas fa-id-card me-2"></i> Detail Data Pegawai
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center border-end">
+                            <i class="fas fa-user-circle fa-8x text-secondary my-4"></i>
+                            <h3 class="mt-2 text-primary">{{ object.user.get_full_name }}</h3>
+                            <p class="text-muted">{{ object.jabatan }}</p>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <h4 class="border-bottom pb-2 mb-3 text-info">Informasi Kontak & Identitas</h4>
+                            <dl class="row">
+                                <dt class="col-sm-4">Nama Lengkap:</dt>
+                                <dd class="col-sm-8">{{ object.user.get_full_name }}</dd>
 
-        .info-label {
-            font-weight: 600;
-            color: #555;
-        }
+                                <dt class="col-sm-4">Nomor Induk Pegawai (NIP):</dt>
+                                <dd class="col-sm-8">{{ object.no_induk_pegawai }}</dd>
 
-        .btn-primary {
-            background-color: #005ae0;
-            border-radius: 10px;
-            padding: 8px 16px;
-        }
-        .btn-primary:hover {
-            background-color: #0045b8;
-        }
-    </style>
-</head>
-<body>
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">{{ object.user.email }}</dd>
 
-<div class="container py-5">
+                                <dt class="col-sm-4">No. KTP:</dt>
+                                <dd class="col-sm-8">{{ object.no_ktp }}</dd>
 
-    <div class="main-card">
-        <h2 class="mb-4">Detail Pegawai</h2>
+                                <dt class="col-sm-4">No. Telepon:</dt>
+                                <dd class="col-sm-8">{{ object.no_telepon }}</dd>
 
-        <div class="mb-3">
-            <span class="info-label">Nama:</span><br>
-            {{ pegawai.user.first_name }} {{ pegawai.user.last_name }}
+                                <dt class="col-sm-4">Alamat:</dt>
+                                <dd class="col-sm-8">{{ object.alamat }}</dd>
+                            </dl>
+
+                            <h4 class="border-bottom pb-2 mb-3 mt-4 text-info">Informasi Kepegawaian</h4>
+                            <dl class="row">
+                                <dt class="col-sm-4">Departemen:</dt>
+                                <dd class="col-sm-8">{{ object.departemen }}</dd>
+
+                                <dt class="col-sm-4">Tanggal Bergabung:</dt>
+                                <dd class="col-sm-8">{{ object.tanggal_bergabung|date:"d F Y" }}</dd>
+
+                                <dt class="col-sm-4">Gaji Pokok:</dt>
+                                <dd class="col-sm-8">Rp. {{ object.gaji_pokok|floatformat:0 }}</dd>
+                                
+                                <dt class="col-sm-4">Status:</dt>
+                                <dd class="col-sm-8">
+                                    {# PERBAIKAN LOGIKA: Bandingkan dengan string penuh yang tersimpan di DB #}
+                                    {% if object.status == 'Aktif' %}
+                                        <span class="badge bg-success">{{ object.get_status_display }}</span>
+                                    {% elif object.status == 'Cuti' %}
+                                        <span class="badge bg-warning text-dark">{{ object.get_status_display }}</span>
+                                    {% elif object.status == 'Inaktif' %} 
+                                        <span class="badge bg-danger">{{ object.get_status_display }}</span>
+                                    {% else %}
+                                        {# Kondisi untuk Null/String Kosong atau Nilai yang Tidak Diharapkan #}
+                                        <span class="badge bg-secondary">Status: {{ object.get_status_display|default:"Belum Ditetapkan" }}</span>
+                                    {% endif %}
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <a href="{% url 'pegawai_update' pk=object.pk %}" class="btn btn-warning btn-sm text-dark">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    <a href="{% url 'pegawai_delete' pk=object.pk %}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i> Hapus
+                    </a>
+                    <a href="{% url 'pegawai_list' %}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-list me-1"></i> Kembali ke Daftar
+                    </a>
+                </div>
+
+            </div>
         </div>
-
-        <div class="mb-3">
-            <span class="info-label">Email:</span><br>
-            {{ pegawai.user.email }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">No. Induk Pegawai:</span><br>
-            {{ pegawai.no_induk_pegawai }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">No. KTP:</span><br>
-            {{ pegawai.no_ktp }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">No. Telepon:</span><br>
-            {{ pegawai.no_telepon }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">Alamat:</span><br>
-            {{ pegawai.alamat }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">Jabatan:</span><br>
-            {{ pegawai.jabatan }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">Departemen:</span><br>
-            {{ pegawai.departemen }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">Tanggal Bergabung:</span><br>
-            {{ pegawai.tanggal_bergabung }}
-        </div>
-
-        <div class="mb-3">
-            <span class="info-label">Gaji Pokok:</span><br>
-            Rp {{ pegawai.gaji_pokok|floatformat:0 }}
-        </div>
-
-        <div class="mb-4">
-            <span class="info-label">Status:</span><br>
-            {{ pegawai.status }}
-        </div>
-
-        <div class="d-flex justify-content-between">
-            <a href="{% url 'pegawai_update' pegawai.pk %}" class="btn btn-primary">Edit</a>
-            <a href="{% url 'pegawai_delete' pegawai.pk %}" class="btn btn-danger">Hapus</a>
-            <a href="{% url 'pegawai_list' %}" class="btn btn-secondary">Kembali</a>
-        </div>
-
     </div>
 
-</div>
-
-</body>
-</html>
+{% endblock %}

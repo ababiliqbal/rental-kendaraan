@@ -4,16 +4,19 @@ from .models import Pegawai, Shift, JadwalKerja, HistoriKerjaPegawai, GajiPegawa
 
 
 class PegawaiForm(forms.ModelForm):
-    """Form untuk create/update data pegawai"""
-    # Tambahan field untuk User
+    """Form kustom untuk create/update data pegawai, 
+    menggabungkan field User (first_name, last_name, email) dan Pegawai."""
+    
+    # Tambahan field untuk Model User (ini TIDAK ada di Model Pegawai)
     first_name = forms.CharField(
-        max_length=30,
+        max_length=150, # Disesuaikan dengan max_length di Model User bawaan
         label="Nama Depan",
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     last_name = forms.CharField(
-        max_length=30,
+        max_length=150, # Disesuaikan dengan max_length di Model User bawaan
         label="Nama Belakang",
+        required=False, # Opsional di User Model
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
     email = forms.EmailField(
@@ -23,8 +26,16 @@ class PegawaiForm(forms.ModelForm):
     
     class Meta:
         model = Pegawai
-        fields = ['no_induk_pegawai', 'no_ktp', 'no_telepon', 'alamat', 
-                  'jabatan', 'departemen', 'tanggal_bergabung', 'gaji_pokok', 'status']
+        
+        # KUNCI: Gabungkan Field User yang ditambahkan secara manual 
+        # dengan semua field dari Pegawai (kecuali 'user', 'created_at', 'updated_at')
+        fields = [
+            'first_name', 'last_name', 'email',  # <--- Field User
+            'no_induk_pegawai', 'no_ktp', 'no_telepon', 'alamat', 
+            'jabatan', 'departemen', 'tanggal_bergabung', 'gaji_pokok', 
+            'status'
+        ] 
+        
         widgets = {
             'no_induk_pegawai': forms.TextInput(attrs={'class': 'form-control'}),
             'no_ktp': forms.TextInput(attrs={'class': 'form-control'}),
@@ -36,19 +47,6 @@ class PegawaiForm(forms.ModelForm):
             'gaji_pokok': forms.NumberInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
         }
-    
-    def save(self, commit=True):
-        """Override save untuk update User object juga"""
-        pegawai = super().save(commit=False)
-        # Update related User object
-        pegawai.user.first_name = self.cleaned_data['first_name']
-        pegawai.user.last_name = self.cleaned_data['last_name']
-        pegawai.user.email = self.cleaned_data['email']
-        
-        if commit:
-            pegawai.user.save()
-            pegawai.save()
-        return pegawai
 
 
 class ShiftForm(forms.ModelForm):
@@ -65,7 +63,8 @@ class ShiftForm(forms.ModelForm):
 
 
 class JadwalKerjaForm(forms.ModelForm):
-    """Form untuk create/update jadwal kerja"""
+    """Form untuk create/update jadwal kerja, dilengkapi validasi overlap."""
+    
     class Meta:
         model = JadwalKerja
         fields = ['pegawai', 'shift', 'tanggal_mulai', 'tanggal_selesai']
@@ -75,6 +74,64 @@ class JadwalKerjaForm(forms.ModelForm):
             'tanggal_mulai': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'tanggal_selesai': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         }
+
+    def clean(self):
+        """
+        Melakukan validasi utama, termasuk pengecekan tumpang tindih tanggal.
+        """
+        cleaned_data = super().clean()
+        pegawai = cleaned_data.get('pegawai')
+        tanggal_mulai = cleaned_data.get('tanggal_mulai')
+        tanggal_selesai = cleaned_data.get('tanggal_selesai')
+        
+        # --- Pengecekan 1: Tanggal Mulai dan Selesai ---
+        if tanggal_mulai and tanggal_selesai and tanggal_mulai > tanggal_selesai:
+             raise ValidationError(
+                'Tanggal mulai tidak boleh melebihi tanggal selesai.',
+                code='invalid_date_range'
+            )
+            
+        # Pengecekan tumpang tindih hanya dilakukan jika pegawai dan tanggal mulai ada
+        if pegawai and tanggal_mulai:
+            
+            # Mendapatkan ID instance yang sedang diedit (jika ada), agar instance itu sendiri dikecualikan dari pengecekan
+            instance_id = self.instance.pk 
+            
+            # --- Pengecekan 2: Overlap Jadwal ---
+            
+            # 1. Kasus Tumpang Tindih dengan Jadwal yang Berakhir
+            # Cari jadwal yang TANGGAL SELESAI-nya sudah ditetapkan
+            overlap_queryset = JadwalKerja.objects.filter(
+                pegawai=pegawai,
+                tanggal_mulai__lte=tanggal_selesai if tanggal_selesai else tanggal_mulai, # Jadwal overlap dimulai sebelum atau pada akhir jadwal baru
+                tanggal_selesai__gte=tanggal_mulai,                                        # Jadwal overlap berakhir setelah atau pada awal jadwal baru
+            ).exclude(pk=instance_id)
+
+            # 2. Kasus Tumpang Tindih dengan Jadwal yang Tidak Berakhir (Open-ended)
+            # Cari jadwal yang TANGGAL SELESAI-nya NULL (berlaku tanpa batas)
+            if tanggal_selesai:
+                # Jika jadwal baru berakhir, cek jadwal tanpa batas yang dimulai sebelum akhir jadwal baru
+                overlap_queryset_null = JadwalKerja.objects.filter(
+                    pegawai=pegawai,
+                    tanggal_selesai__isnull=True,
+                    tanggal_mulai__lte=tanggal_selesai # Jadwal tanpa batas dimulai sebelum atau pada akhir jadwal baru
+                ).exclude(pk=instance_id)
+                overlap_queryset |= overlap_queryset_null
+            else:
+                # Jika jadwal baru juga tanpa batas (tanggal_selesai=None), cek jadwal tanpa batas lainnya
+                overlap_queryset_null = JadwalKerja.objects.filter(
+                    pegawai=pegawai,
+                    tanggal_selesai__isnull=True,
+                ).exclude(pk=instance_id)
+                overlap_queryset |= overlap_queryset_null
+            
+            if overlap_queryset.exists():
+                raise ValidationError(
+                    'Jadwal pegawai ini tumpang tindih dengan jadwal lain yang sudah ada.',
+                    code='schedule_overlap'
+                )
+
+        return cleaned_data
 
 
 class HistoriKerjaPegawaiForm(forms.ModelForm):

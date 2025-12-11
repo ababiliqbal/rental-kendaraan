@@ -1,0 +1,144 @@
+{% extends "based.html" %}
+
+{% block title %}Daftar Slip Gaji{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
+    <h1 class="text-primary">Daftar Slip Gaji Pegawai</h1>
+
+    {% if user.is_staff %}
+    <a href="{% url 'gaji_create' %}" class="btn btn-success">
+        <i class="fas fa-plus-circle me-2"></i> Buat Slip Gaji Baru
+    </a>
+    {% endif %}
+</div>
+
+{# Pesan sukses #}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{# Grid Cards Layout #}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+    {% for gaji in gaji_list %}
+    <div class="col">
+        <div class="card h-100 shadow-sm border-primary">
+
+            <!-- HEADER -->
+            <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fas fa-receipt me-2"></i>
+                    {{ gaji.pegawai.user.get_full_name }}
+                </span>
+
+                <span class="badge bg-light text-dark">
+                    {{ gaji.bulan|date:"F Y" }}
+                </span>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body d-flex flex-column">
+
+                <h5 class="card-title text-dark mb-2">
+                    Slip Gaji – {{ gaji.bulan|date:"F Y" }}
+                </h5>
+
+                <ul class="list-group list-group-flush mb-3">
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Gaji Pokok
+                        <span class="badge bg-info rounded-pill">Rp {{ gaji.gaji_pokok|default:0 }}</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Potongan
+                        <span class="badge bg-danger rounded-pill">Rp {{ gaji.potongan|default:0 }}</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Tunjangan
+                        <span class="badge bg-success rounded-pill">Rp {{ gaji.tunjangan|default:0 }}</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Total Gaji Bersih
+                        <span class="badge bg-primary rounded-pill">Rp {{ gaji.total_gaji|default:0 }}</span>
+                    </li>
+
+                </ul>
+
+                <!-- Status -->
+                <p class="mt-1">
+                    {% if gaji.status == 'Sudah Dibayar' %}
+                        <span class="badge bg-success">{{ gaji.status }}</span>
+                    {% elif gaji.status == 'Menunggu Verifikasi' %}
+                        <span class="badge bg-warning text-dark">{{ gaji.status }}</span>
+                    {% else %}
+                        <span class="badge bg-danger">{{ gaji.status }}</span>
+                    {% endif %}
+                </p>
+
+                <!-- ACTION BUTTONS -->
+                <div class="mt-auto d-flex gap-2">
+                    
+                    <a href="{% url 'gaji_detail' pk=gaji.pk %}" 
+                       class="btn btn-outline-primary flex-grow-1">Lihat Detail</a>
+
+                    {% if user.is_staff %}
+                    <a href="{% url 'gaji_update' pk=gaji.pk %}" class="btn btn-warning">Edit</a>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    
+    <div class="col-12">
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            Belum ada data slip gaji.
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+
+
+{# Pagination #}
+{% if is_paginated %}
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-4">
+        
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Sebelumnya</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Sebelumnya</span></li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+        </li>
+
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Berikutnya</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span class="page-link">Berikutnya</span></li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

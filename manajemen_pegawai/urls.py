@@ -2,9 +2,10 @@ from django.urls import path
 from .views import (
     PegawaiListView, PegawaiDetailView, PegawaiCreateView, 
     PegawaiUpdateView, PegawaiDeleteView,
-    ShiftListView, ShiftCreateView, ShiftUpdateView,
-    GajiPegawaiListView, GajiPegawaiCreateView, GajiPegawaiUpdateView,
-    JadwalKerjaListView, JadwalKerjaCreateView,
+    ShiftListView, ShiftCreateView, ShiftUpdateView, ShiftDetailView, ShiftDeleteView,
+    GajiPegawaiListView, GajiPegawaiCreateView, GajiPegawaiUpdateView, GajiPegawaiDetailView,
+    JadwalKerjaListView, JadwalKerjaCreateView, JadwalKerjaDetailView, 
+    JadwalKerjaUpdateView, JadwalKerjaDeleteView,
 )
 
 urlpatterns = [
@@ -17,15 +18,21 @@ urlpatterns = [
     
     # Shift URLs
     path('shift/', ShiftListView.as_view(), name='shift_list'),
-    path('shift/create/', ShiftCreateView.as_view(), name='shift_create'),
-    path('shift/update/<int:pk>/', ShiftUpdateView.as_view(), name='shift_update'),
+    path('shift/tambah/', ShiftCreateView.as_view(), name='shift_create'),
+    path('shift/<int:pk>/', ShiftDetailView.as_view(), name='shift_detail'),
+    path('shift/<int:pk>/edit/', ShiftUpdateView.as_view(), name='shift_update'),
+    path('shift/<int:pk>/hapus/', ShiftDeleteView.as_view(), name='shift_delete'),
     
     # Gaji URLs
     path('gaji/', GajiPegawaiListView.as_view(), name='gaji_list'),
     path('gaji/create/', GajiPegawaiCreateView.as_view(), name='gaji_create'),
+    path('gaji/<int:pk>/', GajiPegawaiDetailView.as_view(), name='gaji_detail'), 
     path('gaji/update/<int:pk>/', GajiPegawaiUpdateView.as_view(), name='gaji_update'),
     
     # Jadwal Kerja URLs
     path('jadwal/', JadwalKerjaListView.as_view(), name='jadwal_list'),
-    path('jadwal/create/', JadwalKerjaCreateView.as_view(), name='jadwal_create'),
+    path('jadwal/tambah/', JadwalKerjaCreateView.as_view(), name='jadwal_create'),
+    path('jadwal/<int:pk>/', JadwalKerjaDetailView.as_view(), name='jadwal_detail'),
+    path('jadwal/<int:pk>/edit/', JadwalKerjaUpdateView.as_view(), name='jadwal_update'),
+    path('jadwal/<int:pk>/hapus/', JadwalKerjaDeleteView.as_view(), name='jadwal_delete'),
 ]

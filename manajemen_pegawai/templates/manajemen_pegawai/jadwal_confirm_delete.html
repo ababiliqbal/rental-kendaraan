@@ -1,0 +1,59 @@
+{% extends "based.html" %}
+
+{% block title %}Konfirmasi Penghapusan Jadwal{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-lg-6 col-md-8">
+
+        <div class="card shadow-lg border-danger">
+
+            <div class="card-header bg-danger text-white text-center">
+                <h2 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i> PERINGATAN PENGHAPUSAN
+                </h2>
+            </div>
+
+            <div class="card-body text-center">
+
+                <p class="lead">
+                    Apakah Anda YAKIN ingin menghapus jadwal ini?
+                </p>
+
+                <div class="alert alert-danger" role="alert">
+                    Data jadwal yang akan dihapus:
+                    <br>
+                    <strong>Pegawai: {{ object.pegawai.user.get_full_name }}</strong>
+                    <br>
+                    <strong>Shift: {{ object.shift }}</strong>
+                    <br>
+                    <strong>Tanggal Mulai: {{ object.tanggal_mulai|date:"d F Y" }}</strong>
+                    <br>
+                    <strong>Tanggal Selesai: {{ object.tanggal_selesai|date:"d F Y" }}</strong>
+                </div>
+
+                <p class="text-muted">
+                    Tindakan ini tidak dapat dibatalkan dan akan menghapus data jadwal secara permanen.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <button type="submit" class="btn btn-danger btn-lg me-3">
+                        <i class="fas fa-trash-alt me-1"></i> Ya, Hapus Permanen
+                    </button>
+
+                    <a href="{% url 'jadwal_list' %}" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </a>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

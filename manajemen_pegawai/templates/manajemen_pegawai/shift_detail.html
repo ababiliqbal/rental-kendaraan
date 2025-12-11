@@ -1,0 +1,71 @@
+{% extends "based.html" %}
+
+{% block title %}
+    Detail Shift: {{ object.get_nama_shift_display }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+
+        <div class="card shadow-lg mb-5 bg-white rounded">
+
+            <div class="card-header bg-info text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-clock me-2"></i> Detail Data Shift
+                </h2>
+            </div>
+
+            <div class="card-body">
+
+                <h4 class="border-bottom pb-2 mb-3 text-info">Informasi Shift</h4>
+
+                <dl class="row">
+
+                    <dt class="col-sm-4">Nama Shift:</dt>
+                    <dd class="col-sm-8">
+                        {{ object.get_nama_shift_display }}
+                    </dd>
+
+                    <dt class="col-sm-4">Jam Mulai:</dt>
+                    <dd class="col-sm-8">
+                        {{ object.jam_mulai|time:"H:i" }}
+                    </dd>
+
+                    <dt class="col-sm-4">Jam Selesai:</dt>
+                    <dd class="col-sm-8">
+                        {{ object.jam_selesai|time:"H:i" }}
+                    </dd>
+
+                    <dt class="col-sm-4">Tunjangan Shift:</dt>
+                    <dd class="col-sm-8">
+                        Rp. {{ object.tunjangan_shift|floatformat:0 }}
+                    </dd>
+
+                </dl>
+
+            </div>
+
+            <div class="card-footer d-flex justify-content-end gap-2">
+
+                <a href="{% url 'shift_update' pk=object.pk %}" class="btn btn-warning btn-sm text-dark">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+
+                <a href="{% url 'shift_delete' pk=object.pk %}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash me-1"></i> Hapus
+                </a>
+
+                <a href="{% url 'shift_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list me-1"></i> Kembali ke Daftar
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,94 @@
+{% extends "based.html" %}
+
+{% block title %}
+    Detail Slip Gaji: {{ object.pegawai.user.get_full_name }}
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8 col-md-10">
+
+        <div class="card shadow-lg mb-5 bg-white rounded">
+
+            <!-- HEADER -->
+            <div class="card-header bg-info text-white">
+                <h2 class="mb-0">
+                    <i class="fas fa-receipt me-2"></i> Detail Slip Gaji Pegawai
+                </h2>
+            </div>
+
+            <!-- CARD BODY -->
+            <div class="card-body">
+
+                <h4 class="border-bottom pb-2 mb-3 text-info">Informasi Gaji Pegawai</h4>
+
+                <dl class="row">
+
+                    <dt class="col-sm-4">Nama Pegawai:</dt>
+                    <dd class="col-sm-8">
+                        {{ object.pegawai.user.get_full_name }}
+                    </dd>
+
+                    <dt class="col-sm-4">Bulan Gaji:</dt>
+                    <dd class="col-sm-8">
+                        {{ object.bulan|date:"F Y" }}
+                    </dd>
+
+                    <dt class="col-sm-4">Gaji Pokok:</dt>
+                    <dd class="col-sm-8">
+                        Rp {{ object.gaji_pokok|default:0 }}
+                    </dd>
+
+                    <dt class="col-sm-4">Potongan:</dt>
+                    <dd class="col-sm-8">
+                        Rp {{ object.potongan|default:0 }}
+                    </dd>
+
+                    <dt class="col-sm-4">Tunjangan:</dt>
+                    <dd class="col-sm-8">
+                        Rp {{ object.tunjangan|default:0 }}
+                    </dd>
+
+                    <dt class="col-sm-4">Total Gaji Bersih:</dt>
+                    <dd class="col-sm-8 fw-bold text-primary">
+                        Rp {{ object.total_gaji|default:0 }}
+                    </dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+
+                        {% if object.status == 'Sudah Dibayar' %}
+                            <span class="badge bg-success">{{ object.status }}</span>
+                        {% elif object.status == 'Menunggu Verifikasi' %}
+                            <span class="badge bg-warning text-dark">{{ object.status }}</span>
+                        {% else %}
+                            <span class="badge bg-danger">{{ object.status }}</span>
+                        {% endif %}
+                    </dd>
+
+                </dl>
+
+            </div>
+
+            <!-- FOOTER BUTTONS -->
+            <div class="card-footer d-flex justify-content-end gap-2">
+
+                {% if user.is_staff %}
+                <a href="{% url 'gaji_update' pk=object.pk %}" class="btn btn-warning btn-sm text-dark">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                {% endif %}
+
+                <a href="{% url 'gaji_list' %}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list me-1"></i> Kembali ke Daftar
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
