@@ -47,14 +47,20 @@ def verifikasi_pembayaran(request, tagihan_id, aksi):
         tagihan.status = 'Lunas'
         tagihan.save()
         messages.success(request, f"Pembayaran Order #{tagihan.reservasi.id} DITERIMA!")
+
     elif aksi == 'tolak':
-        tagihan.status = 'Belum Lunas' # Kembalikan status agar user upload ulang
+        tagihan.status = 'Belum Lunas'
         tagihan.save()
-        messages.warning(request, f"Pembayaran Order #{tagihan.reservasi.id} DITOLAK.")
+        
+        pembayaran_terakhir = tagihan.riwayat_pembayaran.last()
+        if pembayaran_terakhir:
+            pembayaran_terakhir.is_valid = False
+            pembayaran_terakhir.save()
+
+        messages.warning(request, f"Pembayaran Order #{tagihan.reservasi.id} DITOLAK. User diminta upload ulang.")
         
     return redirect('dashboard_pegawai')
 
-# ... (dashboard_pegawai & verifikasi_pembayaran biarkan saja) ...
 
 @user_passes_test(cek_pegawai, login_url='home')
 def proses_pengembalian(request, reservasi_id):

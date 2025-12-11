@@ -82,7 +82,7 @@ class Tagihan(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_BAYAR, default='Belum Lunas')
     
     def hitung_uang_masuk(self):
-        total = self.riwayat_pembayaran.aggregate(Sum('jumlah'))['jumlah__sum']
+        total = self.riwayat_pembayaran.filter(is_valid=True).aggregate(Sum('jumlah'))['jumlah__sum']
         return total if total else 0
 
     def sisa_bayar(self):
@@ -104,6 +104,7 @@ class Pembayaran(models.Model):
     
     # Validasi (Diisi oleh Admin/Pegawai nanti)
     diterima_oleh = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    is_valid = models.BooleanField(default=True)
     
     def __str__(self):
         return f"Bayar Rp {self.jumlah} - {self.metode}"
