@@ -25,17 +25,20 @@ def cek_pegawai(user):
 
 @user_passes_test(cek_pegawai, login_url='home')
 def dashboard_pegawai(request):
-    # 1. Ambil data Tagihan yang statusnya "Menunggu Verifikasi" (Prioritas Utama)
     tagihan_pending = Tagihan.objects.filter(status='Menunggu Verifikasi').order_by('id')
     
-    # 2. Ambil Reservasi yang aktif (Sedang jalan / Perlu diambil)
-    reservasi_aktif = Reservasi.objects.filter(status__in=['Dipesan', 'Aktif']).order_by('-tgl_mulai')
+    tabel_reservasi = Reservasi.objects.filter(status__in=['Dipesan', 'Aktif']).order_by('-tgl_mulai')
+    
+    real_sewa_aktif = Reservasi.objects.filter(status='Aktif').count()
     
     context = {
         'tagihan_pending': tagihan_pending,
-        'reservasi_aktif': reservasi_aktif,
+        'reservasi_aktif': tabel_reservasi,
+        
         'total_pending': tagihan_pending.count(),
-        'total_aktif': reservasi_aktif.count()
+        
+
+        'total_aktif': real_sewa_aktif 
     }
     return render(request, 'manajemen_pegawai/dashboard.html', context)
 
