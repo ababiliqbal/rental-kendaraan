@@ -1,7 +1,21 @@
-# .gitignore
+# 1. Folder Virtual Environment (JANGAN DIUPLOAD)
 venv/
+env/
+.env
+
+# 2. File Compiled Python (Sampah sistem)
 __pycache__/
 *.pyc
+*.pyo
+
+# 3. Database Lokal (JANGAN DIUPLOAD - Ini berisi data dummy kita)
 db.sqlite3
+
+# 4. Media Uploads (Gambar mobil/pegawai local tidak perlu diupload)
+# Kita hanya butuh folder kosongnya saja nanti di server
+media/
+!media/.gitkeep 
+
+# 5. System Files
 .DS_Store
-.vscode/
+Thumbs.db
