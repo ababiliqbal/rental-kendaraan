@@ -123,19 +123,28 @@ def booking_view(request, mobil_id):
                         messages.error(request, f"Maaf, Sopir {reservasi.supir.user.first_name} sudah ada jadwal di tanggal tersebut.")
                         return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
                 
-                # SKENARIO B: User Minta Dipilihkan Otomatis (Field Supir Kosong)
+                # SKENARIO B: User Minta Dipilihkan Otomatis (Hybrid Algorithm)
                 else:
-                    # Cari sopir Aktif yang TIDAK ada di daftar sibuk
                     calon_supir = Pegawai.objects.filter(
                         jabatan='Driver', 
                         status='Aktif'
-                    ).exclude(id__in=supir_sibuk_ids).first()
+                    ).exclude(
+                        id__in=supir_sibuk_ids
+                    ).order_by(
+                        '-rating',      # Prioritas 1: Rating TERTINGGI (Desc)
+                        'jumlah_trip'   # Prioritas 2: Trip TERDIKIT (Asc) - untuk pemerataan
+                    ).first()
 
                     if calon_supir:
                         reservasi.supir = calon_supir
-                        messages.info(request, f"Sistem otomatis memilihkan sopir untuk Anda: {calon_supir.user.first_name}")
+                        
+                        # [PENTING] Update statistik supir
+                        calon_supir.jumlah_trip += 1
+                        calon_supir.save()
+                        
+                        messages.info(request, f"Sistem merekomendasikan Top Rated Driver kami: {calon_supir.user.first_name} (⭐{calon_supir.rating})")
                     else:
-                        messages.error(request, "Mohon maaf, semua sopir kami FULL BOOKED pada tanggal tersebut. Silakan geser tanggal atau pilih opsi 'Lepas Kunci'.")
+                        messages.error(request, "Mohon maaf, semua sopir kami FULL BOOKED. Silakan pilih tanggal lain.")
                         return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
             
             # [TAMBAHAN SAFETY] Jika user tidak centang pakai sopir, pastikan data bersih

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # ==========================================
 # MANAJEMEN PEGAWAI MODELS (FITUR BARU)
@@ -75,13 +76,32 @@ class Pegawai(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    rating = models.FloatField(
+        default=5.0, 
+        validators=[MinValueValidator(1.0), MaxValueValidator(5.0)],
+        help_text="Rating kinerja (1.0 - 5.0). Diinput manual oleh Admin."
+    )
+    
+    # Jumlah Trip: Untuk keseimbangan beban kerja
+    jumlah_trip = models.PositiveIntegerField(
+        default=0, 
+        help_text="Total perjalanan yang sudah ditugaskan."
+    )
+    
+    @property
+    def total_trip_sukses(self):
+        # Kita perlu mengecek apakah relasi ini ada (untuk menghindari error pada pegawai non-driver)
+        if hasattr(self, 'riwayat_menyetir'):
+            return self.riwayat_menyetir.filter(status='Selesai').count()
+        return 0
+    
     class Meta:
         verbose_name = "Pegawai"
         verbose_name_plural = "Daftar Pegawai"
         ordering = ['-created_at']
     
     def __str__(self):
-        return f"{self.user.get_full_name()} ({self.no_induk_pegawai})"
+        return f"{self.user.get_full_name()} (⭐{self.rating})"
 
 
 class JadwalKerja(models.Model):
