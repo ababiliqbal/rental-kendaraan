@@ -74,7 +74,14 @@ class PegawaiForm(forms.ModelForm):
     
     class Meta:
         model = Pegawai
-        fields = ['first_name', 'last_name', 'email', 'no_induk_pegawai', 'no_ktp', 'no_telepon', 'alamat', 'jabatan', 'departemen', 'tanggal_bergabung', 'gaji_pokok', 'status'] 
+        # [UPDATE] Menambahkan field 'rating' ke dalam list fields
+        fields = [
+            'first_name', 'last_name', 'email', 
+            'no_induk_pegawai', 'no_ktp', 'no_telepon', 'alamat', 
+            'jabatan', 'departemen', 'tanggal_bergabung', 
+            'gaji_pokok', 'status', 'rating'
+        ] 
+        
         widgets = {
             'no_induk_pegawai': forms.TextInput(attrs={'class': 'form-control'}),
             'no_ktp': forms.TextInput(attrs={'class': 'form-control'}),
@@ -85,6 +92,20 @@ class PegawaiForm(forms.ModelForm):
             'tanggal_bergabung': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'gaji_pokok': forms.NumberInput(attrs={'class': 'form-control'}),
             'status': forms.Select(attrs={'class': 'form-control'}),
+            
+            # [BARU] Widget untuk Rating
+            'rating': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'min': '1.0', 
+                'max': '5.0', 
+                'step': '0.1', # Agar bisa input desimal, misal 4.5
+                'placeholder': '1.0 - 5.0'
+            }),
+        }
+        
+        # [BARU] Label khusus agar Admin tidak bingung
+        labels = {
+            'rating': 'Rating Kinerja (Wajib diisi untuk Driver, abaikan untuk lainnya)'
         }
 
 class ShiftForm(forms.ModelForm):

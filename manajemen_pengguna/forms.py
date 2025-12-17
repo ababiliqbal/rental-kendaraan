@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.forms import DateInput
 from .models import ProfilPengguna, Reservasi, Pembayaran
 from django.core.exceptions import ValidationError
+from manajemen_pegawai.models import Pegawai
 
 def validate_file_size(value):
     filesize = value.size
@@ -43,11 +44,30 @@ class RegistrasiPelangganForm(forms.ModelForm):
 class ReservasiForm(forms.ModelForm):
     class Meta:
         model = Reservasi
-        fields = ['tgl_mulai', 'tgl_selesai']
+        # [UPDATE] Menambahkan field sopir ke sini
+        fields = ['tgl_mulai', 'tgl_selesai', 'pakai_supir', 'supir']
+        
         widgets = {
-            'tgl_mulai': DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'tgl_selesai': DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'tgl_mulai': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'tgl_selesai': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            
+            # Widget khusus untuk Sopir (agar terbaca oleh JavaScript di HTML)
+            'pakai_supir': forms.CheckboxInput(attrs={'class': 'form-check-input', 'id': 'id_pakai_supir'}),
+            'supir': forms.Select(attrs={'class': 'form-select', 'id': 'id_supir'}),
         }
+        
+        labels = {
+            'pakai_supir': 'Gunakan Jasa Sopir (+ Rp 150.000/hari)',
+            'supir': 'Pilih Sopir (Kosongkan jika ingin dipilihkan sistem)',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # [LOGIC] Filter dropdown hanya menampilkan pegawai 'Driver' & 'Aktif'
+        # Query ini sekarang aman karena kita sudah import Pegawai di atas
+        self.fields['supir'].queryset = Pegawai.objects.filter(jabatan='Driver', status='Aktif')
+        self.fields['supir'].required = False  # Boleh kosong (untuk fitur Auto-Assign)
+        self.fields['supir'].empty_label = "--- Pilihkan Saya Sopir Otomatis ---"
 
 class PembayaranForm(forms.ModelForm):
     bukti_transfer = forms.ImageField(

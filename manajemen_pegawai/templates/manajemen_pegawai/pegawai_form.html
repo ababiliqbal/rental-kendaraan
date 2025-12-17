@@ -63,6 +63,7 @@
                                 <label class="form-label fw-bold small">Nomor KTP</label>
                                 {{ form.no_ktp }}
                             </div>
+
                             <div class="col-md-4">
                                 <label class="form-label fw-bold small">Jabatan</label>
                                 {{ form.jabatan }}
@@ -75,16 +76,30 @@
                                 <label class="form-label fw-bold small">Status Keaktifan</label>
                                 {{ form.status }}
                             </div>
-                            <div class="col-md-6">
+
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold small">Gaji Pokok</label>
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     {{ form.gaji_pokok }}
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-bold small">Tanggal Masuk</label>
                                 {{ form.tanggal_bergabung }}
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small text-dark">Rating Kinerja (Driver)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-warning bg-opacity-10 text-warning border-warning">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                    {{ form.rating }}
+                                </div>
+                                <div class="form-text" style="font-size: 10px;">
+                                    Skala 1.0 - 5.0 (Abaikan jika bukan Driver)
+                                </div>
                             </div>
                         </div>
 

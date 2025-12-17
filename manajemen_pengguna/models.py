@@ -5,6 +5,7 @@ from django.utils import timezone
 # Kita import Kendaraan dari app sebelah
 from kendaraan_ext.models import Kendaraan
 from django.db.models import Sum
+from manajemen_pegawai.models import Pegawai
 
 # ==========================================
 # 1. PROFIL PENGGUNA
@@ -30,29 +31,45 @@ class ProfilPengguna(models.Model):
 # ==========================================
 class Reservasi(models.Model):
     STATUS_RESERVASI = [
-        ('Dipesan', 'Dipesan'),   # Baru booking, belum bayar/belum diambil
-        ('Aktif', 'Aktif'),       # Mobil sedang dibawa pelanggan
-        ('Selesai', 'Selesai'),   # Mobil sudah dikembalikan
-        ('Batal', 'Batal'),       # Dibatalkan user/admin
+        ('Dipesan', 'Dipesan'),
+        ('Aktif', 'Aktif'),
+        ('Selesai', 'Selesai'),
+        ('Batal', 'Batal'),
     ]
 
-    # Relasi
     pelanggan = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservasi_saya')
     kendaraan = models.ForeignKey(Kendaraan, on_delete=models.CASCADE)
     
-    # Detail Sewa
     tgl_mulai = models.DateField()
     tgl_selesai = models.DateField()
     tgl_pengembalian_aktual = models.DateField(null=True, blank=True)
     
-    # Biaya (Disimpan statis agar tidak berubah kalau harga mobil naik)
+    # [FIELD BARU - FITUR SOPIR]
+    pakai_supir = models.BooleanField(default=False, verbose_name="Pakai Sopir?")
+    
+    # Relasi ke Sopir (Pegawai). limit_choices_to memastikan dropdown hanya menampilkan Driver
+    supir = models.ForeignKey(
+        Pegawai, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='riwayat_menyetir',
+        limit_choices_to={'jabatan': 'Driver'} 
+    )
+    
+    # Menyimpan nominal biaya sopir terpisah (untuk detail invoice)
+    biaya_supir = models.DecimalField(max_digits=12, decimal_places=0, default=0)
+    
+    # Total Biaya (Mobil + Sopir)
     total_biaya = models.DecimalField(max_digits=12, decimal_places=0)
     
     status = models.CharField(max_length=15, choices=STATUS_RESERVASI, default='Dipesan')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def hitung_durasi(self):
-        return (self.tgl_selesai - self.tgl_mulai).days
+        durasi = (self.tgl_selesai - self.tgl_mulai).days
+        # Jika sewa dan kembali di hari yang sama, hitung 1 hari
+        return durasi if durasi > 0 else 1
     
     @property
     def cek_tagihan(self):
@@ -60,9 +77,32 @@ class Reservasi(models.Model):
             return self.tagihan
         except:
             return None
-    
+
+    def save(self, *args, **kwargs):
+        # 1. Hitung Durasi
+        durasi = self.hitung_durasi()
+        
+        # 2. Hitung Biaya Sewa Mobil Dasar
+        biaya_mobil = self.kendaraan.harga_sewa_per_hari * durasi
+        
+        # 3. Hitung Biaya Sopir (Jika dicentang)
+        # Konstanta harga sopir: Rp 150.000 / hari
+        HARGA_SUPIR_PER_HARI = 150000
+
+        if self.pakai_supir:
+            self.biaya_supir = HARGA_SUPIR_PER_HARI * durasi
+        else:
+            self.biaya_supir = 0
+            self.supir = None  # Pastikan sopir kosong jika tidak dipilih
+            
+        # 4. Update Total Biaya
+        self.total_biaya = biaya_mobil + self.biaya_supir
+        
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Booking #{self.id} - {self.pelanggan.username}"
+        info_supir = " (With Driver)" if self.pakai_supir else " (Lepas Kunci)"
+        return f"Booking #{self.id} - {self.pelanggan.username}{info_supir}"
 
 # ==========================================
 # 3. TAGIHAN & PEMBAYARAN
