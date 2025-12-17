@@ -1,4 +1,4 @@
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
@@ -123,26 +123,27 @@ def booking_view(request, mobil_id):
                         messages.error(request, f"Maaf, Sopir {reservasi.supir.user.first_name} sudah ada jadwal di tanggal tersebut.")
                         return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
                 
-                # SKENARIO B: User Minta Dipilihkan Otomatis (Hybrid Algorithm)
+                # SKENARIO B: User Minta Dipilihkan Otomatis (Hybrid Algorithm - REVISI LIVE DATA)
                 else:
+                    # Kita gunakan annotate untuk menghitung jumlah trip 'Selesai' secara real-time di database
                     calon_supir = Pegawai.objects.filter(
                         jabatan='Driver', 
                         status='Aktif'
+                    ).annotate(
+                        # Buat kolom bayangan 'real_trip_count' yang isinya jumlah booking status 'Selesai'
+                        real_trip_count=Count('riwayat_menyetir', filter=Q(riwayat_menyetir__status='Selesai'))
                     ).exclude(
                         id__in=supir_sibuk_ids
                     ).order_by(
-                        '-rating',      # Prioritas 1: Rating TERTINGGI (Desc)
-                        'jumlah_trip'   # Prioritas 2: Trip TERDIKIT (Asc) - untuk pemerataan
+                        '-rating',          # Prioritas 1: Rating TERTINGGI (Bintang 5 dulu)
+                        'real_trip_count'   # Prioritas 2: Trip TERDIKIT (Ascending) -> Agar ADIL / Pemerataan
                     ).first()
 
                     if calon_supir:
                         reservasi.supir = calon_supir
+                        # (Hapus kode calon_supir.jumlah_trip += 1 karena sudah otomatis)
                         
-                        # [PENTING] Update statistik supir
-                        calon_supir.jumlah_trip += 1
-                        calon_supir.save()
-                        
-                        messages.info(request, f"Sistem merekomendasikan Top Rated Driver kami: {calon_supir.user.first_name} (⭐{calon_supir.rating})")
+                        messages.info(request, f"Sistem merekomendasikan Driver Terbaik: {calon_supir.user.first_name} (⭐{calon_supir.rating})")
                     else:
                         messages.error(request, "Mohon maaf, semua sopir kami FULL BOOKED. Silakan pilih tanggal lain.")
                         return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
