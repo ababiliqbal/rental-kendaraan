@@ -1,14 +1,15 @@
+from django.db.models import Sum, Q
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Q # <--- Wajib tambah ini di paling atas file
 
 # Import Model
 from kendaraan_ext.models import Kendaraan
 from .models import Reservasi, Tagihan, Pembayaran, ProfilPengguna
 from .forms import RegistrasiPelangganForm, ReservasiForm, PembayaranForm, EditProfilForm
+from manajemen_pegawai.models import Pegawai
 
 # ==========================================
 # 1. HALAMAN UTAMA (HOME)
@@ -93,18 +94,65 @@ def booking_view(request, mobil_id):
             reservasi.pelanggan = request.user
             reservasi.kendaraan = mobil
             
+            # [PERBAIKAN LOGIKA DURASI]
+            # Menghitung selisih hari
             durasi = (reservasi.tgl_selesai - reservasi.tgl_mulai).days
-            if durasi <= 0:
-                messages.error(request, "Tanggal selesai harus lebih besar dari tanggal mulai!")
+            
+            # Jika tanggal terbalik (Minus) -> ERROR
+            if durasi < 0:
+                messages.error(request, "Tanggal selesai tidak boleh sebelum tanggal mulai!")
                 return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
+            
+            # Jika tanggal sama (0 hari) -> Dianggap 1 Hari, Lanjut!
+            
+            # ====================================================
+            # [LOGIKA BARU] SISTEM MANAJEMEN SOPIR & CEK BENTROK
+            # ====================================================
+            if reservasi.pakai_supir:
+                # Cari ID Sopir yang sedang SIBUK di rentang tanggal tersebut
+                supir_sibuk_ids = Reservasi.objects.filter(
+                    Q(status='Dipesan') | Q(status='Aktif'), 
+                    tgl_mulai__lte=reservasi.tgl_selesai,
+                    tgl_selesai__gte=reservasi.tgl_mulai,
+                    supir__isnull=False
+                ).values_list('supir_id', flat=True)
+
+                # SKENARIO A: User Memilih Sopir Secara Manual
+                if reservasi.supir:
+                    if reservasi.supir.id in supir_sibuk_ids:
+                        messages.error(request, f"Maaf, Sopir {reservasi.supir.user.first_name} sudah ada jadwal di tanggal tersebut.")
+                        return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
                 
-            reservasi.total_biaya = durasi * mobil.harga_sewa_per_hari
+                # SKENARIO B: User Minta Dipilihkan Otomatis (Field Supir Kosong)
+                else:
+                    # Cari sopir Aktif yang TIDAK ada di daftar sibuk
+                    calon_supir = Pegawai.objects.filter(
+                        jabatan='Driver', 
+                        status='Aktif'
+                    ).exclude(id__in=supir_sibuk_ids).first()
+
+                    if calon_supir:
+                        reservasi.supir = calon_supir
+                        messages.info(request, f"Sistem otomatis memilihkan sopir untuk Anda: {calon_supir.user.first_name}")
+                    else:
+                        messages.error(request, "Mohon maaf, semua sopir kami FULL BOOKED pada tanggal tersebut. Silakan geser tanggal atau pilih opsi 'Lepas Kunci'.")
+                        return render(request, 'manajemen_pengguna/booking_form.html', {'form': form, 'mobil': mobil})
+            
+            # [TAMBAHAN SAFETY] Jika user tidak centang pakai sopir, pastikan data bersih
+            else:
+                reservasi.supir = None
+                reservasi.biaya_supir = 0
+            # ====================================================
+
             reservasi.status = 'Dipesan'
+            
+            # Simpan (Model akan menghitung total biaya otomatis)
             reservasi.save()
             
+            # Buat Tagihan
             Tagihan.objects.create(reservasi=reservasi, total_akhir=reservasi.total_biaya)
             
-            messages.success(request, f"Booking berhasil! Total: Rp {reservasi.total_biaya:,}")
+            messages.success(request, f"Booking berhasil! Total Tagihan: Rp {reservasi.total_biaya:,.0f}")
             return redirect('riwayat')
     else:
         form = ReservasiForm()

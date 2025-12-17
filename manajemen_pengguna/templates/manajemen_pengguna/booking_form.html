@@ -241,20 +241,55 @@
                             </div>
                         </div>
 
+                        {% if mobil.cek_mobil %}
+                        <div class="mt-4 p-3 bg-light rounded-3 border">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="fw-bold text-dark mb-0">Layanan Pengemudi</label>
+                                <span class="badge bg-success rounded-pill">+ Rp 150.000 /hari</span>
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                {{ form.pakai_supir }}
+                                <label class="form-check-label small text-muted" for="id_pakai_supir">
+                                    Saya ingin menggunakan jasa sopir
+                                </label>
+                            </div>
+
+                            <div id="driverSelectContainer" style="display: none; transition: all 0.3s;">
+                                <label class="form-label small fw-bold text-secondary">Pilih Pengemudi</label>
+                                {{ form.supir }}
+                                <div class="form-text text-primary small mt-2">
+                                    <i class="fas fa-magic me-1"></i> Biarkan kosong jika ingin sistem memilihkan sopir
+                                    terbaik secara otomatis.
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
                         <div class="summary-box">
                             <h6 class="fw-bold text-dark border-bottom pb-2 mb-3">Rincian Pembayaran</h6>
+
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Harga Sewa</span>
-                                <span class="fw-bold">Rp {{ mobil.harga_sewa_per_hari | floatformat:0 }}</span>
+                                <span class="text-muted">Unit Kendaraan</span>
+                                <span class="fw-bold">Rp {{ mobil.harga_sewa_per_hari | floatformat:0 }} x <span
+                                        id="displayDurasi">0</span>
+                                    Hari</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">Durasi</span>
-                                <span class="fw-bold" id="displayDurasi">0 Hari</span>
+
+                            <div class="d-flex justify-content-between mb-2 text-success" id="rowBiayaSupir"
+                                style="display: none;">
+                                <span><i class="fas fa-user-tie me-1"></i> Jasa Sopir</span>
+                                <span class="fw-bold" id="displayBiayaSupir">Rp 0</span>
                             </div>
+
                             <hr>
+
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-bold text-dark">Total Estimasi</span>
-                                <span class="total-price" id="displayTotal">Rp 0</span>
+                                <div>
+                                    <span class="fw-bold text-dark d-block">Total Estimasi</span>
+                                    <small class="text-muted" style="font-size: 10px;">*Sudah termasuk pajak</small>
+                                </div>
+                                <span class="total-price text-primary" id="displayTotal">Rp 0</span>
                             </div>
                         </div>
 
@@ -277,56 +312,99 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // 1. Styling Input Otomatis
-            const inputs = document.querySelectorAll('input[type="date"]');
-            inputs.forEach(input => {
-                input.classList.add('form-control');
-                input.style.cursor = 'pointer';
-            });
-
-            // 2. Logic Kalkulasi Harga
+            // 1. Inisialisasi Elemen
             const startInput = document.querySelector('input[name="tgl_mulai"]');
             const endInput = document.querySelector('input[name="tgl_selesai"]');
+
+            // Elemen Sopir
+            // Pastikan ID sesuai dengan render default Django (id_namafield)
+            const checkSupir = document.getElementById('id_pakai_supir');
+            const selectSupir = document.getElementById('id_supir');
+            const driverContainer = document.getElementById('driverSelectContainer');
+
+            // Elemen Display Harga
             const displayDurasi = document.getElementById('displayDurasi');
+            const displayBiayaSupir = document.getElementById('displayBiayaSupir');
+            const rowBiayaSupir = document.getElementById('rowBiayaSupir');
             const displayTotal = document.getElementById('displayTotal');
 
-            // --- SOLUSI ANTI ERROR AUTO-FORMAT ---
-            // Kita bungkus pakai tanda kutip "..." agar dianggap string oleh editor
-            // Lalu kita ubah jadi angka pakai parseFloat()
-            const hargaPerHari = parseFloat("{{ mobil.harga_sewa_per_hari }}");
+            // Konstanta Harga
+            const HARGA_MOBIL = parseFloat("{{ mobil.harga_sewa_per_hari }}");
+            const HARGA_SUPIR = 150000; // Sesuai kesepakatan
 
+            // Styling Input Django agar seragam dengan Bootstrap
+            [startInput, endInput, selectSupir].forEach(el => {
+                if (el) el.classList.add('form-control');
+            });
+            if (checkSupir) checkSupir.classList.add('form-check-input');
+            if (selectSupir) selectSupir.classList.add('form-select');
+
+            // 2. Logic Toggle Tampilan Sopir
+            function toggleDriverOption() {
+                if (checkSupir.checked) {
+                    driverContainer.style.display = 'block';
+                    rowBiayaSupir.style.display = 'flex'; // Munculkan baris biaya sopir di summary
+                } else {
+                    driverContainer.style.display = 'none';
+                    selectSupir.value = ""; // Reset pilihan dropdown jika di-uncheck
+                    rowBiayaSupir.style.display = 'none'; // Sembunyikan baris biaya sopir
+                }
+                calculateTotal(); // Hitung ulang harga
+            }
+
+            // 3. Logic Kalkulasi Total
             function calculateTotal() {
                 const startDate = new Date(startInput.value);
                 const endDate = new Date(endInput.value);
 
-                // Pastikan kedua tanggal valid
                 if (!isNaN(startDate) && !isNaN(endDate)) {
-                    // Hitung selisih waktu (ms)
+                    // Hitung durasi
                     const diffTime = endDate - startDate;
-                    // Konversi ke hari (1000ms * 60s * 60m * 24h)
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    // Validasi minimal 1 hari jika tanggal sama
+                    if (diffDays === 0) diffDays = 1;
 
                     if (diffDays > 0) {
-                        const total = diffDays * hargaPerHari;
+                        // Hitung Komponen Biaya
+                        let totalMobil = diffDays * HARGA_MOBIL;
+                        let totalSupir = 0;
 
-                        displayDurasi.textContent = diffDays + " Hari";
-                        // Format Rupiah
-                        displayTotal.textContent = "Rp " + total.toLocaleString('id-ID');
+                        if (checkSupir && checkSupir.checked) {
+                            totalSupir = diffDays * HARGA_SUPIR;
+                        }
 
+                        let grandTotal = totalMobil + totalSupir;
+
+                        // Update UI Text
+                        displayDurasi.textContent = diffDays;
+
+                        // Update Baris Sopir
+                        displayBiayaSupir.textContent = "+ Rp " + totalSupir.toLocaleString('id-ID');
+
+                        // Update Grand Total
+                        displayTotal.textContent = "Rp " + grandTotal.toLocaleString('id-ID');
                         displayTotal.classList.remove('text-danger');
                         displayTotal.classList.add('text-primary');
+
                     } else {
-                        displayDurasi.textContent = "0 Hari";
-                        displayTotal.textContent = "Tanggal Tidak Valid";
+                        // Jika tanggal minus (Start > End)
+                        displayDurasi.textContent = "0";
+                        displayTotal.textContent = "Cek Tanggal!";
                         displayTotal.classList.add('text-danger');
-                        displayTotal.classList.remove('text-primary');
                     }
                 }
             }
 
-            // Pasang event listener saat user mengubah tanggal
+            // 4. Event Listeners
             startInput.addEventListener('change', calculateTotal);
             endInput.addEventListener('change', calculateTotal);
+
+            if (checkSupir) {
+                checkSupir.addEventListener('change', toggleDriverOption);
+                // Jalankan sekali saat load (antisipasi browser nyimpen cache checkbox)
+                toggleDriverOption();
+            }
         });
     </script>
 </body>
